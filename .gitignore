@@ -1,0 +1,100 @@
+# Visual Studio and .NET common ignores
+
+# Build Folders
+[Bb]in/
+[Oo]bj/
+out/
+
+# Visual Studio workspace files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code workspace settings
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+packages.lock.json
+nuget.exe
+*.snupkg
+
+# MSBuild
+*.ilk
+*.meta
+*.obj
+*.log
+GeneratedArtifacts/
+
+# DotCover
+*.dotCover
+
+# Test results
+TestResults/
+*.trx
+coverage*/
+coverage/
+
+# Publish outputs
+publish/
+*.Publish.xml
+*.publishsettings
+
+# Azure
+*.azurePubxml
+
+# Entity Framework
+_MigrationHistory/
+
+# SQL Server files
+*.mdf
+*.ldf
+
+# IIS Express
+/.vs/*/applicationhost.config
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userprefs
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Mac files
+.DS_Store
+
+# Logs
+*.log
+
+# Packed files
+*.zip
+*.tar.gz
+*.7z
+
+# Certificates
+*.pfx
+*.cer
+
+# Local tools and caches
+.dotnet/tools/
+~$*
+
+# Ignore published web output
+wwwroot/dist/
+
+# End of .gitignore
