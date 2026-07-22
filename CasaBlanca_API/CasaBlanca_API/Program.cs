@@ -35,6 +35,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IInmuebleService, InmuebleService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICatalogosService, CatalogosService>();
+builder.Services.AddScoped<IIngresoService, IngresoService>();
+
 
 
 // Register EF DbContext for Usuarios endpoints
@@ -63,5 +65,7 @@ app.UseHttpsRedirection();
 app.ConfigureInmueblesEndpoints();
 app.ConfigureUsuarioEndpoints();
 app.ConfigureCatalogosEndpoints();
+app.ConfigureIngresosEndPoints();
+
 
 app.Run();

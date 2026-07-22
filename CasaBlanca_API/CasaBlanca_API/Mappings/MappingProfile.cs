@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using CasaBlanca_API.Models;
+using CasaBlanca_API.Models.DTO;
+using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Usuario;
 
 namespace CasaBlanca_API.Mappings
@@ -8,7 +10,8 @@ namespace CasaBlanca_API.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<UsuarioRequest, Usuario>();
+            CreateMap<UsuarioRequest, ListaCasasDTO>();
+            CreateMap<ListaCasasDTO, CasaResponse>();
         }
     }
 }

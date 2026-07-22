@@ -1,5 +1,9 @@
-﻿using CasaBlanca_API.Interfaces;
+﻿using AutoMapper;
+using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models;
+using CasaBlanca_API.Models.DTO;
+using CasaBlanca_API.Models.DTO.Casas;
+using CasaBlanca_API.Models.DTO.Catalogo;
 using CasaBlanca_API.Models.DTO.Rol;
 using CasaBlanca_API.Models.DTO.Usuario;
 
@@ -12,6 +16,8 @@ namespace CasaBlanca_API.EndPoints
             var connectionString = app.Configuration.GetConnectionString("DefultConnection");
 
             app.MapGet("/api/GelAllRol", GetAllRol).WithName("GetRol").Produces<IEnumerable<RolDTO>>(200).Produces(500);
+            app.MapGet("/api/GetCasas", GetAllCasas).WithName("GetAllCasas").Produces<IEnumerable<CasaResponse>>(200);
+            app.MapGet("/api/GetConceptoIngreso", GetConceptoIngreso).WithName("GetConceptoIngreso").Produces<IEnumerable<CatalogoIngresoResponse>>(200);
         }
 
         public async static Task<IResult> GetAllRol(ICatalogosService service)
@@ -27,6 +33,34 @@ namespace CasaBlanca_API.EndPoints
             }
         }
 
+        public async static Task<IResult> GetAllCasas(IInmuebleService inmuebleService, IMapper mapper)
+        {
+            try
+            {
+                IEnumerable<ListaCasasDTO> datos = await inmuebleService.GetInmueblesAsync();
 
+                var responseList = mapper.Map<List<CasaResponse>>(datos);
+
+                return Results.Ok(responseList);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        public async static Task<IResult> GetConceptoIngreso(ICatalogosService ctcatalogoService, IMapper mapper)
+        {
+            try
+            {
+                IEnumerable<CatalogoIngresoResponse> result = await ctcatalogoService.GetAllConceptoIngresosAsync();
+
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
     }
 }
