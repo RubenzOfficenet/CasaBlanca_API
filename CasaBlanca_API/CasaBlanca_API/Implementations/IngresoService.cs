@@ -1,5 +1,4 @@
 ﻿using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Ingresos;
 using Dapper;
@@ -21,6 +20,7 @@ namespace CasaBlanca_API.Implementations
             try
              {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
+                int result = 0;
 
                 string query = @"INSERT INTO Ingresos
                                    (IdCasa
@@ -41,9 +41,10 @@ namespace CasaBlanca_API.Implementations
 
                 using (var connection = new SqlConnection(connectionString))
                 {
-                    var result = await connection.ExecuteAsync(query, ingresoRequest);
-                    return result;
+                    result = await connection.ExecuteAsync(query, ingresoRequest);
                 }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -84,8 +85,10 @@ namespace CasaBlanca_API.Implementations
             {
                 throw new Exception(ex.Message);
             }
-
         }
+
+
+
 
     }
 }

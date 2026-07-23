@@ -43,5 +43,9 @@ namespace CasaBlanca_API.EndPoints
                     statusCode: StatusCodes.Status500InternalServerError);
             }
         }
+
+
+
+
     }
 }
