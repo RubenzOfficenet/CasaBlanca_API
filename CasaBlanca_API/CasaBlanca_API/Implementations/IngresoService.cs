@@ -4,6 +4,7 @@ using CasaBlanca_API.Models.DTO.Ingresos;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
+
 namespace CasaBlanca_API.Implementations
 {
     public class IngresoService : IIngresoService
@@ -53,31 +54,37 @@ namespace CasaBlanca_API.Implementations
 
         }
 
-        public async Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync()
+        public async Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync(int year, int month)
         {
             try
             {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
+                
+
                 string query = @"SELECT ingresos.id,
-                                    inmueble.numerocasa,
-                                    inmueble.nombretitular + ' ' +  inmueble.apellidostitular as nombretitular,
-                                    inmueble.nombreocupante + ' ' + inmueble.apellidosocupante as nombreocupante,
-                                    Inmueble.NumeroCasa,
-                                    ingresos.fecharecepcion,
-                                    ingresos.numerorecibo,
-                                    concepto.concepto,
-                                    ingresos.fechaconcepto,
-                                    ingresos.monto,
-                                    ingresos.observaciones
-                                FROM   ingresos 
-                                    INNER JOIN inmueble ON ingresos.idcasa = inmueble.id
-                                    INNER JOIN concepto ON ingresos.idconcepto = concepto.id 
-                                ORDER BY ingresos.fecharecepcion";
+                                       inmueble.numerocasa,
+                                       inmueble.nombretitular + ' ' + inmueble.apellidostitular AS nombretitular,
+                                       inmueble.nombreocupante + ' ' + inmueble.apellidosocupante AS nombreocupante,
+                                       ingresos.fecharecepcion,
+                                       ingresos.numerorecibo,
+                                       concepto.concepto,
+                                       ingresos.fechaconcepto,
+                                       ingresos.monto,
+                                       ingresos.observaciones,
+                                       SUM(ingresos.monto) OVER () AS totalMonto
+                                FROM ingresos
+                                INNER JOIN inmueble ON ingresos.idcasa = inmueble.id
+                                INNER JOIN concepto ON ingresos.idconcepto = concepto.id
+                                WHERE (YEAR(ingresos.fecharecepcion) = @anio AND MONTH(ingresos.fecharecepcion) = @mes)
+                                   OR (YEAR(ingresos.fechaconcepto) = @anio AND MONTH(ingresos.fechaconcepto) = @mes)
+                                ORDER BY ingresos.fecharecepcion;";
+
+                var parameters = new { anio = year, mes = month };
 
                 using (var connection = new SqlConnection(connectionString))
                 {
-                    IEnumerable<IngresoResponse> result = await connection.QueryAsync<IngresoResponse>(query);
+                    IEnumerable<IngresoResponse> result = await connection.QueryAsync<IngresoResponse>(query, parameters);
                     return result;
                 }
             }

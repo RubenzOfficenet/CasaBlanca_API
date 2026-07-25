@@ -27,11 +27,11 @@ namespace CasaBlanca_API.EndPoints
             }
         }
 
-        private static async Task<IResult> GetIngresos(IIngresoService ingresoService)
+        private static async Task<IResult> GetIngresos(IIngresoService ingresoService, int year, int month)
         {
             try
             {
-                var result = await ingresoService .GetAllIngresosAsync();
+                var result = await ingresoService .GetAllIngresosAsync(year, month);
 
                 return Results.Ok(result);
             }

@@ -21,5 +21,7 @@
         public decimal Monto { get; set; }
 
         public string? Observaciones { get; set; }
+
+        public decimal totalMonto { get; set; }
     }
 }

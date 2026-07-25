@@ -6,6 +6,6 @@ namespace CasaBlanca_API.Interfaces
     public interface IIngresoService
     {
         Task<int> AddIngresoAsync(IngresoRequest ingresoRequest);
-        Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync();
+        Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync(int year, int month);
     }
 }
