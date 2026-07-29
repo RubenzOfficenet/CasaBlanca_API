@@ -78,8 +78,8 @@ namespace CasaBlanca_API.Implementations
                                 INNER JOIN inmueble ON ingresos.idcasa = inmueble.id
                                 INNER JOIN concepto ON ingresos.idconcepto = concepto.id
                                 WHERE (
-                                        (YEAR(ingresos.fecharecepcion) = 2026 AND MONTH(ingresos.fecharecepcion) = 7)
-                                        OR (YEAR(ingresos.fechaconcepto) = 2026 AND MONTH(ingresos.fechaconcepto) = 7)
+                                        (YEAR(ingresos.fecharecepcion) = @anio AND MONTH(ingresos.fecharecepcion) = @mes)
+                                        OR (YEAR(ingresos.fechaconcepto) = @anio AND MONTH(ingresos.fechaconcepto) = @mes)
                                       )
                                   AND ingresos.borrado = 0
                                 ORDER BY ingresos.fecharecepcion;";
