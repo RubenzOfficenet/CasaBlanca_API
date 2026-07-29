@@ -45,5 +45,7 @@ public partial class Inmueble
 
     public virtual EstadoOcupacion? EstadoOcupacionNavigation { get; set; }
 
+    public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
+
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

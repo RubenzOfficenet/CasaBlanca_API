@@ -15,9 +15,13 @@ public partial class CasaBlancaDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Concepto> Conceptos { get; set; }
+
     public virtual DbSet<EstadoOcupacion> EstadoOcupacions { get; set; }
 
     public virtual DbSet<Estatus> Estatuses { get; set; }
+
+    public virtual DbSet<Ingreso> Ingresos { get; set; }
 
     public virtual DbSet<Inmueble> Inmuebles { get; set; }
 
@@ -32,6 +36,20 @@ public partial class CasaBlancaDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Concepto>(entity =>
+        {
+            entity.ToTable("Concepto");
+
+            entity.Property(e => e.Concepto1)
+                .HasMaxLength(50)
+                .HasColumnName("Concepto");
+            entity.Property(e => e.DateAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DateUpdated).HasColumnType("datetime");
+            entity.Property(e => e.TipoConcepto).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<EstadoOcupacion>(entity =>
         {
             entity.ToTable("EstadoOcupacion");
@@ -54,6 +72,29 @@ public partial class CasaBlancaDbContext : DbContext
             entity.Property(e => e.Estatus1)
                 .HasMaxLength(50)
                 .HasColumnName("Estatus");
+        });
+
+        modelBuilder.Entity<Ingreso>(entity =>
+        {
+            entity.Property(e => e.Borrado).HasDefaultValue(false);
+            entity.Property(e => e.DateAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DateUpdated).HasColumnType("datetime");
+            entity.Property(e => e.FechaConcepto).HasColumnType("datetime");
+            entity.Property(e => e.FechaRecepcion).HasColumnType("datetime");
+            entity.Property(e => e.Monto).HasColumnType("money");
+            entity.Property(e => e.Observaciones).HasColumnType("text");
+
+            entity.HasOne(d => d.IdCasaNavigation).WithMany(p => p.Ingresos)
+                .HasForeignKey(d => d.IdCasa)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ingresos_Inmueble");
+
+            entity.HasOne(d => d.IdConceptoNavigation).WithMany(p => p.Ingresos)
+                .HasForeignKey(d => d.IdConcepto)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ingresos_Concepto");
         });
 
         modelBuilder.Entity<Inmueble>(entity =>
