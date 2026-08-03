@@ -36,6 +36,7 @@ builder.Services.AddScoped<IInmuebleService, InmuebleService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICatalogosService, CatalogosService>();
 builder.Services.AddScoped<IIngresoService, IngresoService>();
+builder.Services.AddScoped<IEgresoService, EgresosService>();
 
 
 
@@ -66,6 +67,6 @@ app.ConfigureInmueblesEndpoints();
 app.ConfigureUsuarioEndpoints();
 app.ConfigureCatalogosEndpoints();
 app.ConfigureIngresosEndPoints();
-
+app.ConfigureEgresosEndPoints();
 
 app.Run();
