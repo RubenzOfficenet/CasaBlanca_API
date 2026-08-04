@@ -14,7 +14,7 @@ public static class EgresosEndPoints
     {
         app.MapPost("/api/AddEgreso", AddEgreso).WithName("AddEgreso").Produces<int>(StatusCodes.Status200OK);
         app.MapGet("/api/GetEgresos", GetEgresos).WithName("GetEgresos").Produces<IEnumerable<EgresoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
-        app.MapPost("/api/UpdateEgreso", UpdateEgreso).WithName("UpdateEgreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
+        app.MapPut("/api/UpdateEgreso", UpdateEgreso).WithName("UpdateEgreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
         app.MapGet("/api/GetEgresoById/{id}", GetEgresoById).WithName("GetEgresoById").Produces<EgresoResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
         app.MapDelete("/api/DeleteEgreso/{id}", DeleteEgreso).WithName("DeleteEgreso").Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
     }
