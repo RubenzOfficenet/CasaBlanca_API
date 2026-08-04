@@ -99,9 +99,9 @@ public static class EgresosEndPoints
                 return Results.NotFound($"No se encontró el egreso con id {id}.");
             }
 
-            int result = await egresoService.DeleteEgresoAsync(id);
+            int rersult = await egresoService.DeleteEgresoAsync(id);
 
-            if (result == 0)
+            if (rersult == 0)
             {
                 return Results.NotFound($"No se pudo eliminar el egreso con id {id}.");
             }
