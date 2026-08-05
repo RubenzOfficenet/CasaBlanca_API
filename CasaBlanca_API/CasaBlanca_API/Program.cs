@@ -40,6 +40,7 @@ builder.Services.AddScoped<IEgresoService, EgresosService>();
 
 
 
+
 // Register EF DbContext for Usuarios endpoints
 builder.Services.AddDbContext<CasaBlancaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefultConnection")));
@@ -67,6 +68,6 @@ app.ConfigureInmueblesEndpoints();
 app.ConfigureUsuarioEndpoints();
 app.ConfigureCatalogosEndpoints();
 app.ConfigureIngresosEndPoints();
-app.ConfigureEgresosEndPoints();
+
 
 app.Run();

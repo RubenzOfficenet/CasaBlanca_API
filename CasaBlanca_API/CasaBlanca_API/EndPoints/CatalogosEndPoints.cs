@@ -5,6 +5,7 @@ using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Catalogo;
 using CasaBlanca_API.Models.DTO.Rol;
+using CasaBlanca_API.Models.DTO.Ubicacion;
 using CasaBlanca_API.Models.DTO.Usuario;
 
 namespace CasaBlanca_API.EndPoints
@@ -18,6 +19,20 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GelAllRol", GetAllRol).WithName("GetRol").Produces<IEnumerable<RolDTO>>(200).Produces(500);
             app.MapGet("/api/GetCasas", GetAllCasas).WithName("GetAllCasas").Produces<IEnumerable<CasaResponse>>(200);
             app.MapGet("/api/GetConceptoIngreso", GetConceptoIngreso).WithName("GetConceptoIngreso").Produces<IEnumerable<CatalogoIngresoResponse>>(200);
+            app.MapGet("/api/GetAllUbicaciones", GetAllUbicaciones).WithName("GetAllUbicaciones").Produces<IEnumerable<UbicacionResponseDTO>>(200);
+        }
+
+        public async static Task<IResult> GetAllUbicaciones(ICatalogosService service)
+        {
+            try
+            {
+                IEnumerable<UbicacionResponseDTO> result = await service.GetAllUbicaciones();
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
         }
 
         public async static Task<IResult> GetAllRol(ICatalogosService service)

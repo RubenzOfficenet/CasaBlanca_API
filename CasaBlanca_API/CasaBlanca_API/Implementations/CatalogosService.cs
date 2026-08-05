@@ -2,6 +2,7 @@
 using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Catalogo;
 using CasaBlanca_API.Models.DTO.Rol;
+using CasaBlanca_API.Models.DTO.Ubicacion;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -56,9 +57,27 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
+        public async Task<IEnumerable<UbicacionResponseDTO>> GetAllUbicaciones()
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-      
+                string query = @"SELECT id, NombreUbicacion FROM ubicacion ORDER BY NombreUbicacion";
 
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    var result = await connection.QueryAsync<UbicacionResponseDTO>(query);
 
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+   
     }
 }

@@ -5,7 +5,13 @@
         public int Id { get; set; }
 
         public string? NumeroCasa { get; set; }
+
+        public int idubicacion { get; set; }
+
+        public string? nombreubicacion { get; set; }
+
         public decimal CuotaDeMantenimientoBase { get; set; }
+
         public int? EstadoOcupacion { get; set; }
 
         public string? EstadoInicialOcupacion { get; set; }
@@ -13,10 +19,10 @@
         public string? NombreTitular { get; set; }
 
         public string? ApellidosTitular { get; set; }
-        public string? CelularTitular { get; set; }
 
         public string? EmailTitular { get; set; }
 
+        public string? CelularTitular { get; set; }
 
         public string? NombreOcupante { get; set; }
 

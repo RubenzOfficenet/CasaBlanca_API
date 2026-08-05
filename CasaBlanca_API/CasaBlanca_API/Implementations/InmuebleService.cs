@@ -120,7 +120,7 @@ public  class InmuebleService : IInmuebleService
 
             string query = @"INSERT INTO Inmueble
                                (NumeroCasa
-                               ,Ubicacion
+                               ,IdUbicacion
                                ,CuotaDeMantenimientoBase
                                ,EstadoOcupacion
                                ,NombreTitular
@@ -137,7 +137,7 @@ public  class InmuebleService : IInmuebleService
                                ,Password)
                          VALUES
                                (@NumeroCasa
-                               ,@Ubicacion
+                               ,@IdUbicacion
                                ,@CuotaDeMantenimientoBase
                                ,@EstadoOcupacion
                                ,@NombreTitular
@@ -195,23 +195,28 @@ public  class InmuebleService : IInmuebleService
         {
             var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-            string query = @"SELECT 
-                                   [Id]
-                                    ,[NumeroCasa]
-                                    ,[CuotaDeMantenimientoBase]
-                                    ,[EstadoOcupacion]
-                                    ,[EstadoInicialOcupacion]
-                                    ,[NombreTitular] + ' ' + [ApellidosTitular] as NombreTitular
-                                    ,[EmailTitular]
-                                    ,[CelularTitular]
-                                    ,[EmailTitular]
-                                    ,[NombreOcupante] + ' ' + [ApellidosOcupante] AS NombreOcupante
-                                    ,[EmailOcupante]
-                                    ,[CelularOcupante]
-                                    ,[NumeroHabitantes]
-                                    ,[Observaciones] 
-                            FROM 
-                                View_GetCasas";
+            string query = @"SELECT inmueble.id,
+                                    inmueble.numerocasa,
+                                    inmueble.idubicacion,
+                                    ubicacion.nombreubicacion,
+                                    inmueble.cuotademantenimientobase,
+                                    inmueble.EstadoOcupacion,
+                                    estadoocupacion.estadoinicialocupacion,
+                                    inmueble.nombretitular,
+                                    inmueble.apellidostitular,
+                                    inmueble.emailtitular,
+                                    inmueble.celulartitular,
+                                    inmueble.nombreocupante,
+                                    inmueble.apellidosocupante,
+                                    inmueble.emailocupante,
+                                    inmueble.celularocupante,
+                                    inmueble.numerohabitantes,
+                                    inmueble.observaciones
+                            FROM   inmueble
+                                   INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                                   INNER JOIN estadoocupacion ON inmueble.estadoocupacion = estadoocupacion.id
+                            ORDER  BY 
+                                   inmueble.numerocasa ";
 
             using (var connection = new SqlConnection(connectionString))
             {

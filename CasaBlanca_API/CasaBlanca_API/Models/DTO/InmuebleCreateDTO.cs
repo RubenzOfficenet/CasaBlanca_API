@@ -5,7 +5,7 @@ public class InmuebleCreateDTO
 {
     public string? NumeroCasa { get; set; }
 
-    public string? Ubicacion { get; set; }
+    public int IdUbicacion { get; set; }
 
     public decimal CuotaDeMantenimientoBase { get; set; }
 
