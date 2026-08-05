@@ -8,7 +8,7 @@ public class InmuebleReadDTO
 
     public string? NumeroCasa { get; set; }
 
-    public string? Ubicacion { get; set; }
+    public string? idUbicacion { get; set; }
 
     public decimal CuotaDeMantenimientoBase { get; set; }
 

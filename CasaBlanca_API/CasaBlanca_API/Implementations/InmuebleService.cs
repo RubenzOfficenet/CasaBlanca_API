@@ -23,7 +23,7 @@ public  class InmuebleService : IInmuebleService
 
             string query = @"UPDATE [Inmueble]
                                SET [NumeroCasa] = @NumeroCasa
-                                  ,[Ubicacion] = @Ubicacion
+                                  ,[IdUbicacion] = @IdUbicacion
                                   ,[CuotaDeMantenimientoBase] = @CuotaDeMantenimientoBase
                                   ,[EstadoOcupacion] = @EstadoOcupacion
                                   ,[NombreTitular] = @NombreTitular
@@ -60,7 +60,7 @@ public  class InmuebleService : IInmuebleService
 
             string query = @"SELECT [Id]
                               ,[NumeroCasa]
-                              ,[Ubicacion]
+                              ,[IdUbicacion]
                               ,[CuotaDeMantenimientoBase]
                               ,[EstadoOcupacion]
                               ,[NombreTitular]
