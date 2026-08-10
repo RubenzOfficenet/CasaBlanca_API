@@ -1,6 +1,7 @@
 ﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models;
 using CasaBlanca_API.Models.DTO;
+using CasaBlanca_API.Models.DTO.Casa;
 using CasaBlanca_API.shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.RegularExpressions;
@@ -18,6 +19,7 @@ public static class InmueblesEndpoints
         app.MapPost("/api/UpdateHouse", UpdateHouse).WithName("UpdateHouse").Accepts<UpdateCasaDTO>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
         app.MapPost("/api/CreateHouse", CreateHuse).WithName("CreateHouse").Produces<string>(200).Produces<string>(400).Produces<string>(409).Produces<string>(500);
         app.MapGet("/api/GetEstadosOcupacion", GetEstadosOcupacion).WithName("GetEstadosOcupacion").Produces<string>(200).Produces<string>(500);
+        app.MapGet("/api/GetHouseIdUbicacion", GetHouseIdUbicacion).WithName("GetHouseIdUbicacion").Produces<InmuebleReadDTO>(200).Produces(400).Produces(404).Produces(500);
     }
 
     public async static Task<IResult> UpdateHouse(UpdateCasaDTO inmueble, IInmuebleService inmuebleService)
@@ -127,5 +129,21 @@ public static class InmueblesEndpoints
         }
     }
 
+    public static async Task<IResult> GetHouseIdUbicacion(IInmuebleService inmuebleService, int idUbicacion)
+    {
+        try
+        {
+            var inmueble = await inmuebleService.GetInmuebleByIdUbicacionAsync(idUbicacion);
+
+            if (inmueble == null)
+                return TypedResults.NotFound($"No existen casas con el id {idUbicacion}.");
+
+            return TypedResults.Ok(inmueble);
+        }
+        catch (Exception ex)
+        {
+            return TypedResults.Problem($"An error occurred: {ex.Message}");
+        }
+    }
 
 }

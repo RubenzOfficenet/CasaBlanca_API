@@ -18,6 +18,7 @@ namespace CasaBlanca_API.EndPoints
 
             app.MapGet("/api/GelAllRol", GetAllRol).WithName("GetRol").Produces<IEnumerable<RolDTO>>(200).Produces(500);
             app.MapGet("/api/GetCasas", GetAllCasas).WithName("GetAllCasas").Produces<IEnumerable<CasaResponse>>(200);
+            app.MapGet("/api/GetEstatusEvento", GetEstatusEvento).WithName("GetEstatusEvento").Produces<IEnumerable<CasaResponse>>(200);
             app.MapGet("/api/GetConceptoIngreso", GetConceptoIngreso).WithName("GetConceptoIngreso").Produces<IEnumerable<CatalogoIngresoResponse>>(200);
             app.MapGet("/api/GetAllUbicaciones", GetAllUbicaciones).WithName("GetAllUbicaciones").Produces<IEnumerable<UbicacionResponseDTO>>(200);
         }
@@ -71,6 +72,20 @@ namespace CasaBlanca_API.EndPoints
                 IEnumerable<CatalogoIngresoResponse> result = await ctcatalogoService.GetAllConceptoIngresosAsync();
 
                 return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        public async static Task<IResult> GetEstatusEvento(ICatalogosService catalogoService)
+        {
+            try
+            {
+                IEnumerable<EstatusEventoResponse> datos = await catalogoService.GetAllEstatusEvento();
+
+                return Results.Ok(datos);
             }
             catch (Exception ex)
             {

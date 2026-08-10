@@ -78,6 +78,28 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
-   
+
+        public async Task<IEnumerable<EstatusEventoResponse>> GetAllEstatusEvento()
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"SELECT Id, EstatusEvento FROM EstatusEvento order by EstatusEvento";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    var result = await connection.QueryAsync<EstatusEventoResponse>(query);
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
     }
 }

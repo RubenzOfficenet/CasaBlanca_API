@@ -1,5 +1,6 @@
 ﻿using CasaBlanca_API.Models;
 using CasaBlanca_API.Models.DTO;
+using CasaBlanca_API.Models.DTO.Casa;
 
 namespace CasaBlanca_API.Interfaces
 {
@@ -11,6 +12,8 @@ namespace CasaBlanca_API.Interfaces
         Task<int> CountByNumeroCasaAsync(string numeroCasa);
         Task<InmuebleReadDTO?> GetInmuebleByIdAsync(int id);
         Task<int> UpdateInmuebleAsync(UpdateCasaDTO inmueble);
-    
+        Task<IEnumerable<CasaDto>> GetInmuebleByIdUbicacionAsync(int _idUbicacaion);
+
+
     }
 }

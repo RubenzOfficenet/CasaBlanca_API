@@ -1,5 +1,6 @@
 ﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO;
+using CasaBlanca_API.Models.DTO.Casa;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -231,7 +232,32 @@ public  class InmuebleService : IInmuebleService
 
     }
 
-    
+    public async Task<IEnumerable<CasaDto>> GetInmuebleByIdUbicacionAsync(int idubicacion)
+    {
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+            string query = @"SELECT id,
+                               numerocasa,
+                               idubicacion,
+                               nombretitular + ' ' + apellidostitular as nombretitular,
+                               nombreocupante + ' ' + apellidosocupante as nombreocupante
+                        FROM   inmueble
+                        WHERE  ( idubicacion = @idubicacion) ";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                var inmueble = await connection.QueryAsync<CasaDto>(query, new { idUbicacion = idubicacion });
+                return inmueble;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
+    }
 
 
 }

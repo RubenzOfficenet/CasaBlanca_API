@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AngularPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins("http://localhost:61160")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -37,6 +37,7 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICatalogosService, CatalogosService>();
 builder.Services.AddScoped<IIngresoService, IngresoService>();
 builder.Services.AddScoped<IEgresoService, EgresosService>();
+builder.Services.AddScoped<IEventoService, EventoService>();
 
 
 
@@ -68,6 +69,7 @@ app.ConfigureInmueblesEndpoints();
 app.ConfigureUsuarioEndpoints();
 app.ConfigureCatalogosEndpoints();
 app.ConfigureIngresosEndPoints();
-
+app.ConfigureEgresosEndPoints();
+app.ConfigureEventosIngresosEndPoint();
 
 app.Run();

@@ -9,5 +9,6 @@ namespace CasaBlanca_API.Interfaces
         Task<IEnumerable<RolDTO>> GetAllRolAsync();
         Task<IEnumerable<CatalogoIngresoResponse>> GetAllConceptoIngresosAsync();
         Task<IEnumerable<UbicacionResponseDTO>> GetAllUbicaciones();
+        Task<IEnumerable<EstatusEventoResponse>> GetAllEstatusEvento();
     }
 }
