@@ -6,5 +6,7 @@ namespace CasaBlanca_API.Interfaces
     {
         Task<IEnumerable<EventoResponse>> GetAllEventsAsync(EventoGetAllRequest eventoFiltro);
         Task<int> AddEventoAsync(EventoAddRequest eventoRequest);
+        Task<EventoResponse> GetEventoingresosById(int idEvento);
+        Task<int> UpdateEventoingreso(EventoIngresoUpdateRequest eventoIngresoUpdateRequest);
     }
 }

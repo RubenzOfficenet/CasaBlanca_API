@@ -4,6 +4,7 @@ using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Egresos;
 using CasaBlanca_API.Models.DTO.Eventos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace CasaBlanca_API.EndPoints
 {
@@ -17,8 +18,12 @@ namespace CasaBlanca_API.EndPoints
                 .Produces(StatusCodes.Status500InternalServerError); 
 
             app.MapPost("/api/AddEventoIngreso", AddEventoIngreso).WithName("AddEventoIngreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
+            app.MapGet("/api/GetEventoingresosById", GetEventoingresosById)
+                .WithName("GetEventoingresosById")
+                .Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status500InternalServerError);
 
-            //app.MapPut("/api/UpdateEgreso", UpdateEgreso).WithName("UpdateEgreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
+            app.MapPut("/api/UpdateEventoingreso", UpdateEventoingreso).WithName("UpdateEventoingreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
             //app.MapGet("/api/GetEgresoById/{id}", GetEgresoById).WithName("GetEgresoById").Produces<EgresoResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
             //app.MapDelete("/api/DeleteEgreso/{id}", DeleteEgreso).WithName("DeleteEgreso").Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
         }
@@ -53,6 +58,40 @@ namespace CasaBlanca_API.EndPoints
                 return Results.Problem(
                     detail: ex.Message,
                     title: "Error al agregar el Evento",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        private static async Task<IResult> GetEventoingresosById(int IdEvento, IEventoService eventoService)
+        {
+            try
+            {
+                EventoResponse result = await eventoService.GetEventoingresosById(IdEvento);
+
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    detail: ex.Message,
+                    title: "Error al obtener los Eventos",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        private static async Task<IResult> UpdateEventoingreso([FromBody] EventoIngresoUpdateRequest eventoIngresoUpdateRequest, IEventoService eventoService)
+        {
+            try
+            {
+                int result = await eventoService.UpdateEventoingreso(eventoIngresoUpdateRequest);
+
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    detail: ex.Message,
+                    title: "Error al obtener los Eventos",
                     statusCode: StatusCodes.Status500InternalServerError);
             }
         }
