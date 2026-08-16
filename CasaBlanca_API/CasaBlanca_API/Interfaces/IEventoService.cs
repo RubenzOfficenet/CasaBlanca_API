@@ -8,5 +8,6 @@ namespace CasaBlanca_API.Interfaces
         Task<int> AddEventoAsync(EventoAddRequest eventoRequest);
         Task<EventoResponse> GetEventoingresosById(int idEvento);
         Task<int> UpdateEventoingreso(EventoIngresoUpdateRequest eventoIngresoUpdateRequest);
+        Task<int> DeleteEventoIngreso(int idEventoIntreso);
     }
 }

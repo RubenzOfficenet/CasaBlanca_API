@@ -47,7 +47,8 @@ namespace CasaBlanca_API.Implementations
                                    INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
                                    INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id 
                             WHERE  YEAR(eventosingreso.fechaevento) = @year
-                                   AND MONTH(eventosingreso.fechaevento) = @month";
+                                   AND MONTH(eventosingreso.fechaevento) = @month
+                                   AND eventosingreso.Borrado = 0 ";
 
                 using (var connection = new SqlConnection(connectionString))
                 {
@@ -185,6 +186,34 @@ namespace CasaBlanca_API.Implementations
                     int rowsAffected = await connection.ExecuteAsync(query, eventoIngresoUpdateRequest);
 
                     return rowsAffected;                    
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al actualizar el evento: {ex.Message}", ex);
+            }
+        }
+
+
+        public async Task<int> DeleteEventoIngreso(int idEventoIngreso)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"UPDATE EventosIngreso 
+                                SET Borrado = 1
+                                   ,LastUpdate = GETDATE()
+                                WHERE Id = @idEventoIntreso";
+
+                var parameters = new DynamicParameters();
+                parameters.Add("@idEventoIntreso", idEventoIngreso, DbType.Int32);
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    int rowsAffected = await connection.ExecuteAsync(query, parameters);
+
+                    return rowsAffected;
                 }
             }
             catch (Exception ex)
