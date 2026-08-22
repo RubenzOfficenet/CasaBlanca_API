@@ -38,6 +38,7 @@ builder.Services.AddScoped<ICatalogosService, CatalogosService>();
 builder.Services.AddScoped<IIngresoService, IngresoService>();
 builder.Services.AddScoped<IEgresoService, EgresosService>();
 builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<IEgresoEventoService, EgresoEventoService>();
 
 
 
@@ -71,5 +72,6 @@ app.ConfigureCatalogosEndpoints();
 app.ConfigureIngresosEndPoints();
 app.ConfigureEgresosEndPoints();
 app.ConfigureEventosIngresosEndPoint();
+app.ConfigureEventosEgresosEndPoint();
 
 app.Run();

@@ -23,33 +23,57 @@ namespace CasaBlanca_API.Implementations
             {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-                string query = @"SELECT eventosingreso.id,
-                                   eventosingreso.idinmueble,
-                                   eventosingreso.idestatusevento,
-                                   inmueble.idubicacion,
-                                   ubicacion.nombreubicacion,
-                                   inmueble.numerocasa,
-                                   eventosingreso.fechaevento,
-                                   inmueble.nombretitular,
-                                   inmueble.apellidostitular,
-                                   eventosingreso.recibonumero,
-                                   eventosingreso.fechapago,
-                                   eventosingreso.apartado,
-                                   eventosingreso.liquida,
-                                   eventosingreso.luz,
-                                   eventosingreso.depositogarantia,
-                                   eventosingreso.limpiezadomingo,
-                                   eventosingreso.rentainmobiliario,
-                                   estatusevento.estatusevento,
-                                   eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario as Total
-                            FROM   eventosingreso
-                                   INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
-                                   INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
-                                   INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id 
-                            WHERE  YEAR(eventosingreso.fechaevento) = @year
-                                   AND MONTH(eventosingreso.fechaevento) = @month
-                                   AND eventosingreso.Borrado = 0 ";
+                string query = @"DECLARE @anio INTEGER = @year
+                                    DECLARE @mes INTEGER = @month
+                                    DECLARE @fechaInicio DATE = DATEFROMPARTS(@anio, @mes, 1)
+                                    DECLARE @fechaFin DATE = DATEADD(MONTH, 1, @fechaInicio)
 
+                                    SELECT eventosingreso.id, eventosingreso.idinmueble, eventosingreso.idestatusevento,
+                                           inmueble.idubicacion, ubicacion.nombreubicacion, inmueble.numerocasa,
+                                           eventosingreso.fechaevento, inmueble.nombretitular, inmueble.apellidostitular,
+                                           eventosingreso.recibonumero, eventosingreso.fechapago, eventosingreso.apartado,
+                                           eventosingreso.liquida, eventosingreso.luz, eventosingreso.depositogarantia,
+                                           eventosingreso.limpiezadomingo, eventosingreso.rentainmobiliario,
+                                           estatusevento.estatusevento,
+                                           eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario AS Total,
+                                           (SELECT COUNT(*) FROM EgresoEvento WHERE IdEventoIngreso = eventosingreso.id) AS TotalEgresos
+                                    FROM   eventosingreso
+                                           INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
+                                           INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
+                                           INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                                    WHERE  eventosingreso.fechaevento >= @fechaInicio
+                                           AND eventosingreso.fechaevento < @fechaFin
+                                           AND eventosingreso.Borrado = 0 
+                                    ORDER BY eventosingreso.fechaevento DESC";
+                /*
+                //string query = @"SELECT eventosingreso.id,
+                //                   eventosingreso.idinmueble,
+                //                   eventosingreso.idestatusevento,
+                //                   inmueble.idubicacion,
+                //                   ubicacion.nombreubicacion,
+                //                   inmueble.numerocasa,
+                //                   eventosingreso.fechaevento,
+                //                   inmueble.nombretitular,
+                //                   inmueble.apellidostitular,
+                //                   eventosingreso.recibonumero,
+                //                   eventosingreso.fechapago,
+                //                   eventosingreso.apartado,
+                //                   eventosingreso.liquida,
+                //                   eventosingreso.luz,
+                //                   eventosingreso.depositogarantia,
+                //                   eventosingreso.limpiezadomingo,
+                //                   eventosingreso.rentainmobiliario,
+                //                   estatusevento.estatusevento,
+                //                   eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario as Total
+                //            FROM   eventosingreso
+                //                   INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
+                //                   INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
+                //                   INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id 
+                //            WHERE  YEAR(eventosingreso.fechaevento) = @year
+                //                   AND MONTH(eventosingreso.fechaevento) = @month
+                //                   AND eventosingreso.Borrado = 0 ";
+                */
+                
                 using (var connection = new SqlConnection(connectionString))
                 {
                     IEnumerable<EventoResponse> result = await connection.QueryAsync<EventoResponse>(query, eventoFiltro);

@@ -17,15 +17,27 @@ public partial class CasaBlancaDbContext : DbContext
 
     public virtual DbSet<Concepto> Conceptos { get; set; }
 
+    public virtual DbSet<ConceptoEgresoEvento> ConceptoEgresoEventos { get; set; }
+
+    public virtual DbSet<Egreso> Egresos { get; set; }
+
+    public virtual DbSet<EgresoEvento> EgresoEventos { get; set; }
+
     public virtual DbSet<EstadoOcupacion> EstadoOcupacions { get; set; }
 
     public virtual DbSet<Estatus> Estatuses { get; set; }
+
+    public virtual DbSet<EstatusEvento> EstatusEventos { get; set; }
+
+    public virtual DbSet<EventosIngreso> EventosIngresos { get; set; }
 
     public virtual DbSet<Ingreso> Ingresos { get; set; }
 
     public virtual DbSet<Inmueble> Inmuebles { get; set; }
 
     public virtual DbSet<RolUser> RolUsers { get; set; }
+
+    public virtual DbSet<Ubicacion> Ubicacions { get; set; }
 
     public virtual DbSet<Usuario> Usuarios { get; set; }
 
@@ -50,6 +62,48 @@ public partial class CasaBlancaDbContext : DbContext
             entity.Property(e => e.TipoConcepto).HasMaxLength(50);
         });
 
+        modelBuilder.Entity<ConceptoEgresoEvento>(entity =>
+        {
+            entity.ToTable("ConceptoEgresoEvento");
+
+            entity.Property(e => e.ConceptoEgreso).HasMaxLength(150);
+            entity.Property(e => e.FechaAdd)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Egreso>(entity =>
+        {
+            entity.Property(e => e.Beneficiario).HasMaxLength(150);
+            entity.Property(e => e.Concepto).HasMaxLength(150);
+            entity.Property(e => e.DateAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FechaEgreso).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdate).HasColumnType("datetime");
+            entity.Property(e => e.Monto).HasColumnType("money");
+            entity.Property(e => e.Observaciones).HasColumnType("text");
+        });
+
+        modelBuilder.Entity<EgresoEvento>(entity =>
+        {
+            entity.ToTable("EgresoEvento");
+
+            entity.Property(e => e.AddDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FechaEgreso).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+            entity.Property(e => e.MontoEgreso).HasColumnType("money");
+            entity.Property(e => e.Observaciones).HasColumnType("text");
+
+            entity.HasOne(d => d.IdConceptoEgresoEventoNavigation).WithMany(p => p.EgresoEventos)
+                .HasForeignKey(d => d.IdConceptoEgresoEvento)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EgresoEvento_ConceptoEgresoEvento");
+        });
+
         modelBuilder.Entity<EstadoOcupacion>(entity =>
         {
             entity.ToTable("EstadoOcupacion");
@@ -72,6 +126,47 @@ public partial class CasaBlancaDbContext : DbContext
             entity.Property(e => e.Estatus1)
                 .HasMaxLength(50)
                 .HasColumnName("Estatus");
+        });
+
+        modelBuilder.Entity<EstatusEvento>(entity =>
+        {
+            entity.ToTable("EstatusEvento");
+
+            entity.Property(e => e.DateAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.EstatusEvento1)
+                .HasMaxLength(50)
+                .HasColumnName("EstatusEvento");
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<EventosIngreso>(entity =>
+        {
+            entity.ToTable("EventosIngreso");
+
+            entity.Property(e => e.Apartado).HasColumnType("money");
+            entity.Property(e => e.DateAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DepositoGarantia).HasColumnType("money");
+            entity.Property(e => e.FechaEvento).HasColumnType("datetime");
+            entity.Property(e => e.FechaPago).HasColumnType("datetime");
+            entity.Property(e => e.LastUpdate).HasColumnType("datetime");
+            entity.Property(e => e.LimpiezaDomingo).HasColumnType("money");
+            entity.Property(e => e.Liquida).HasColumnType("money");
+            entity.Property(e => e.Luz).HasColumnType("money");
+            entity.Property(e => e.RentaInmobiliario).HasColumnType("money");
+
+            entity.HasOne(d => d.IdEstatusEventoNavigation).WithMany(p => p.EventosIngresos)
+                .HasForeignKey(d => d.IdEstatusEvento)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EventosIngreso_EstatusEvento");
+
+            entity.HasOne(d => d.IdInmuebleNavigation).WithMany(p => p.EventosIngresos)
+                .HasForeignKey(d => d.IdInmueble)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EventosIngreso_Inmueble");
         });
 
         modelBuilder.Entity<Ingreso>(entity =>
@@ -117,12 +212,16 @@ public partial class CasaBlancaDbContext : DbContext
             entity.Property(e => e.NumeroCasa).HasMaxLength(50);
             entity.Property(e => e.Observaciones).HasColumnType("text");
             entity.Property(e => e.Password).HasMaxLength(250);
-            entity.Property(e => e.Ubicacion).HasMaxLength(50);
             entity.Property(e => e.Usuario).HasMaxLength(50);
 
             entity.HasOne(d => d.EstadoOcupacionNavigation).WithMany(p => p.Inmuebles)
                 .HasForeignKey(d => d.EstadoOcupacion)
                 .HasConstraintName("FK_Inmueble_EstadoOcupacion");
+
+            entity.HasOne(d => d.IdUbicacionNavigation).WithMany(p => p.Inmuebles)
+                .HasForeignKey(d => d.IdUbicacion)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Inmueble_Ubicacion");
         });
 
         modelBuilder.Entity<RolUser>(entity =>
@@ -136,6 +235,21 @@ public partial class CasaBlancaDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.DateUpdated).HasColumnType("datetime");
             entity.Property(e => e.Rol).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Ubicacion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_ubicaciones");
+
+            entity.ToTable("Ubicacion");
+
+            entity.Property(e => e.DatedAdded)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+            entity.Property(e => e.NombreUbicacion)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<Usuario>(entity =>

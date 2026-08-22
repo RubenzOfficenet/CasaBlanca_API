@@ -1,6 +1,7 @@
 ﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Catalogo;
+using CasaBlanca_API.Models.DTO.Even_toEgreso;
 using CasaBlanca_API.Models.DTO.Rol;
 using CasaBlanca_API.Models.DTO.Ubicacion;
 using Dapper;
@@ -90,6 +91,28 @@ namespace CasaBlanca_API.Implementations
                 using (var connection = new SqlConnection(connectionString))
                 {
                     var result = await connection.QueryAsync<EstatusEventoResponse>(query);
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task<IEnumerable<ConceptoEventoEgresoDTO>> GetCatalogoEventosEgreso()
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"SELECT Id, ConceptoEgreso FROM  ConceptoEgresoEvento ORDER BY ConceptoEgreso";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    var result = await connection.QueryAsync<ConceptoEventoEgresoDTO>(query);
 
                     return result;
                 }

@@ -9,7 +9,7 @@ public partial class Inmueble
 
     public string? NumeroCasa { get; set; }
 
-    public string? Ubicacion { get; set; }
+    public int IdUbicacion { get; set; }
 
     public decimal CuotaDeMantenimientoBase { get; set; }
 
@@ -44,6 +44,10 @@ public partial class Inmueble
     public DateTime? LastUpdated { get; set; }
 
     public virtual EstadoOcupacion? EstadoOcupacionNavigation { get; set; }
+
+    public virtual ICollection<EventosIngreso> EventosIngresos { get; set; } = new List<EventosIngreso>();
+
+    public virtual Ubicacion IdUbicacionNavigation { get; set; } = null!;
 
     public virtual ICollection<Ingreso> Ingresos { get; set; } = new List<Ingreso>();
 

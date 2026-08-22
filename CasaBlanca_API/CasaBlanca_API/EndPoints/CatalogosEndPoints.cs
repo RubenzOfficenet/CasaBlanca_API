@@ -4,6 +4,7 @@ using CasaBlanca_API.Models;
 using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Catalogo;
+using CasaBlanca_API.Models.DTO.Even_toEgreso;
 using CasaBlanca_API.Models.DTO.Rol;
 using CasaBlanca_API.Models.DTO.Ubicacion;
 using CasaBlanca_API.Models.DTO.Usuario;
@@ -21,6 +22,7 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GetEstatusEvento", GetEstatusEvento).WithName("GetEstatusEvento").Produces<IEnumerable<CasaResponse>>(200);
             app.MapGet("/api/GetConceptoIngreso", GetConceptoIngreso).WithName("GetConceptoIngreso").Produces<IEnumerable<CatalogoIngresoResponse>>(200);
             app.MapGet("/api/GetAllUbicaciones", GetAllUbicaciones).WithName("GetAllUbicaciones").Produces<IEnumerable<UbicacionResponseDTO>>(200);
+            app.MapGet("/api/GetConceptoEventoEgreso", GetConceptoEventoEgreso).WithName("GetConceptoEventoEgreso").Produces<IEnumerable<ConceptoEventoEgresoDTO>>(200).Produces(500);
         }
 
         public async static Task<IResult> GetAllUbicaciones(ICatalogosService service)
@@ -86,6 +88,19 @@ namespace CasaBlanca_API.EndPoints
                 IEnumerable<EstatusEventoResponse> datos = await catalogoService.GetAllEstatusEvento();
 
                 return Results.Ok(datos);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        public async static Task<IResult> GetConceptoEventoEgreso(ICatalogosService service)
+        {
+            try
+            {
+                IEnumerable<ConceptoEventoEgresoDTO> result = await service.GetCatalogoEventosEgreso();
+                return Results.Ok(result);
             }
             catch (Exception ex)
             {
