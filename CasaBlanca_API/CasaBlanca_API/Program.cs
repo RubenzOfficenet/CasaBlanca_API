@@ -39,7 +39,7 @@ builder.Services.AddScoped<IIngresoService, IngresoService>();
 builder.Services.AddScoped<IEgresoService, EgresosService>();
 builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IEgresoEventoService, EgresoEventoService>();
-
+builder.Services.AddScoped<IEgresoAnaliticoService, EgresoAnaliticoService>();
 
 
 
@@ -73,5 +73,6 @@ app.ConfigureIngresosEndPoints();
 app.ConfigureEgresosEndPoints();
 app.ConfigureEventosIngresosEndPoint();
 app.ConfigureEventosEgresosEndPoint();
+app.ConfigureResumenAnaliticoEndPoint();
 
 app.Run();
