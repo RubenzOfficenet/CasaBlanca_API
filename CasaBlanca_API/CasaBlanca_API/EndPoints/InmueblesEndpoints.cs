@@ -14,7 +14,7 @@ public static class InmueblesEndpoints
     {
         var connectionString = app.Configuration.GetConnectionString("DefultConnection");
 
-        app.MapGet("/api/GetHouses", GetAllHouses).WithName("GetHouses").Produces<IEnumerable<Inmueble>>(200);
+        app.MapGet("/api/GetHouses", GetAllHouses).WithName("GetHouses").Produces<IEnumerable<ListaCasasDTO>>(200);
         app.MapGet("/api/GetHouseById/{id}", GetHouseById).WithName("GetHouseById").Produces<InmuebleReadDTO>(200).Produces(400).Produces(404).Produces(500);
         app.MapPost("/api/UpdateHouse", UpdateHouse).WithName("UpdateHouse").Accepts<UpdateCasaDTO>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
         app.MapPost("/api/CreateHouse", CreateHuse).WithName("CreateHouse").Produces<string>(200).Produces<string>(400).Produces<string>(409).Produces<string>(500);
@@ -85,25 +85,11 @@ public static class InmueblesEndpoints
                 return Results.BadRequest("NumeroCasa is required.");
             }
 
-            var pattern = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$";
-            if (!string.IsNullOrEmpty(inmueble.EmailTitular))
-            {
-                bool emailValido = Regex.IsMatch(inmueble.EmailTitular, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                if (!emailValido)
-                    return Results.BadRequest("El Email del Titular no es válido.");
-            }
-
             // Check by NumeroCasa to avoid duplicates
             int numCasas = await inmuebleService.CountByNumeroCasaAsync(inmueble.NumeroCasa);
             if (numCasas > 0)
             {
                 return Results.Conflict($"Numero de Casa {inmueble.NumeroCasa} ya existe.");
-            }
-
-            // encripta la contraseña si es proporcionada
-            if (!string.IsNullOrEmpty(inmueble.Password))
-            {
-                inmueble.Password = PasswordHasher.HashPassword(inmueble.Password);
             }
 
             // AGREGA LA NUEVA CAS

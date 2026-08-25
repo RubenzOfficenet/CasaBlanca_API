@@ -3,6 +3,7 @@ using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casa;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Linq.Expressions;
 
 
 namespace CasaBlanca_API.Implementations;
@@ -22,23 +23,15 @@ public  class InmuebleService : IInmuebleService
         {
             var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-            string query = @"UPDATE [Inmueble]
-                               SET [NumeroCasa] = @NumeroCasa
-                                  ,[IdUbicacion] = @IdUbicacion
-                                  ,[CuotaDeMantenimientoBase] = @CuotaDeMantenimientoBase
-                                  ,[EstadoOcupacion] = @EstadoOcupacion
-                                  ,[NombreTitular] = @NombreTitular
-                                  ,[ApellidosTitular] = @ApellidosTitular
-                                  ,[EmailTitular] = @EmailTitular
-                                  ,[CelularTitular] = @CelularTitular
-                                  ,[NombreOcupante] = @NombreOcupante
-                                  ,[ApellidosOcupante] = @ApellidosOcupante
-                                  ,[EmailOcupante] = @EmailOcupante
-                                  ,[CelularOcupante] = @CelularOcupante
-                                  ,[NumeroHabitantes] = @NumeroHabitantes
-                                  ,[Observaciones] = @Observaciones
-                                  ,[LastUpdated] = GETUTCDATE()
-                             WHERE [Id] = @Id";
+            string query = @"UPDATE Inmueble
+                           SET NumeroCasa = @NumeroCasa
+                              ,IdUbicacion = @IdUbicacion
+                              ,CuotaDeMantenimientoBase = @CuotaDeMantenimientoBase
+                              ,IdEstadoOcupacion = @IdEstadoOcupacion
+                              ,NumeroHabitantes = @NumeroHabitantes
+                              ,Observaciones = @Observaciones
+                              ,LastUpdated = GetDate()
+                         WHERE id = @Id;";
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -59,30 +52,22 @@ public  class InmuebleService : IInmuebleService
         {
             var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-            string query = @"SELECT [Id]
-                              ,[NumeroCasa]
-                              ,[IdUbicacion]
-                              ,[CuotaDeMantenimientoBase]
-                              ,[EstadoOcupacion]
-                              ,[NombreTitular]
-                              ,[ApellidosTitular]
-                              ,[EmailTitular]
-                              ,[CelularTitular]
-                              ,[NombreOcupante]
-                              ,[ApellidosOcupante]
-                              ,[EmailOcupante]
-                              ,[CelularOcupante]
-                              ,[NumeroHabitantes]
-                              ,[Observaciones]
-                              ,[DateAdded]
-                              ,[LastUpdated]
+            string query = @"SELECT 
+                            Id,
+                      	    NumeroCasa, 
+	                        IdUbicacion, 
+	                        CuotaDeMantenimientoBase, 
+	                        IdEstadoOcupacion, 
+	                        NumeroHabitantes, 
+	                        Observaciones
                           FROM 
                               [Inmueble]
                            WHERE [Id] = @Id";
 
             using (var connection = new SqlConnection(connectionString))
             {
-                var inmueble = await connection.QuerySingleOrDefaultAsync<InmuebleReadDTO>(query, new { Id = id });
+                InmuebleReadDTO inmueble = new InmuebleReadDTO();
+                inmueble = await connection.QuerySingleOrDefaultAsync<InmuebleReadDTO>(query, new { Id = id });
                 return inmueble;
             }
         }
@@ -123,36 +108,20 @@ public  class InmuebleService : IInmuebleService
                                (NumeroCasa
                                ,IdUbicacion
                                ,CuotaDeMantenimientoBase
-                               ,EstadoOcupacion
-                               ,NombreTitular
-                               ,ApellidosTitular
-                               ,EmailTitular
-                               ,CelularTitular
-                               ,NombreOcupante
-                               ,ApellidosOcupante
-                               ,EmailOcupante
-                               ,CelularOcupante
+                               ,IdEstadoOcupacion
                                ,NumeroHabitantes
                                ,Observaciones
-                               ,Usuario
-                               ,Password)
+                               ,DateAdded
+                               ,LastUpdated)
                          VALUES
                                (@NumeroCasa
                                ,@IdUbicacion
                                ,@CuotaDeMantenimientoBase
-                               ,@EstadoOcupacion
-                               ,@NombreTitular
-                               ,@ApellidosTitular
-                               ,@EmailTitular
-                               ,@CelularTitular
-                               ,@NombreOcupante
-                               ,@ApellidosOcupante
-                               ,@EmailOcupante
-                               ,@CelularOcupante
+                               ,@IdEstadoOcupacion
                                ,@NumeroHabitantes
                                ,@Observaciones
-                               ,@Usuario
-                               ,@Password)";
+                               ,GetDATE()
+                               ,null);";
 
             using (var connection = new SqlConnection(connectionString))
             {
@@ -197,27 +166,28 @@ public  class InmuebleService : IInmuebleService
             var connectionString = _configuration.GetConnectionString("DefultConnection");
 
             string query = @"SELECT inmueble.id,
-                                    inmueble.numerocasa,
-                                    inmueble.idubicacion,
-                                    ubicacion.nombreubicacion,
-                                    inmueble.cuotademantenimientobase,
-                                    inmueble.EstadoOcupacion,
-                                    estadoocupacion.estadoinicialocupacion,
-                                    inmueble.nombretitular,
-                                    inmueble.apellidostitular,
-                                    inmueble.emailtitular,
-                                    inmueble.celulartitular,
-                                    inmueble.nombreocupante,
-                                    inmueble.apellidosocupante,
-                                    inmueble.emailocupante,
-                                    inmueble.celularocupante,
-                                    inmueble.numerohabitantes,
-                                    inmueble.observaciones
-                            FROM   inmueble
-                                   INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
-                                   INNER JOIN estadoocupacion ON inmueble.estadoocupacion = estadoocupacion.id
-                            ORDER  BY 
-                                   inmueble.numerocasa ";
+                               inmueble.numerocasa,
+                               inmueble.idubicacion,
+                               ubicacion.nombreubicacion,
+                               inmueble.cuotademantenimientobase,
+                               inmueble.idestadoocupacion,
+                               estadoocupacion.estadoinicialocupacion,
+                               inmueble.numerohabitantes,
+                               inmueble.observaciones,
+                               casa_usuario.idusuario,
+                               usuario.nombre,
+                               usuario.apellidos,
+                               casa_usuario.idcasa,
+                               roluser.rol,
+                               casa_usuario.idrol
+                        FROM   inmueble
+                               INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                               INNER JOIN estadoocupacion ON inmueble.idestadoocupacion = estadoocupacion.id
+                               LEFT JOIN casa_usuario ON inmueble.id = casa_usuario.idcasa
+                               LEFT JOIN usuario ON casa_usuario.idusuario = usuario.id
+                               LEFT JOIN roluser ON casa_usuario.idtiporelacion = roluser.id 
+                        ORDER BY
+                            ubicacion.nombreubicacion";
 
             using (var connection = new SqlConnection(connectionString))
             {
