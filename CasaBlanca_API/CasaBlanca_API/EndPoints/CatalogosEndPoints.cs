@@ -55,7 +55,7 @@ namespace CasaBlanca_API.EndPoints
         {
             try
             {
-                IEnumerable<ListaCasasDTO> datos = await inmuebleService.GetInmueblesAsync();
+                IEnumerable<CatalogoCasasDTO> datos = await inmuebleService.GetInmueblesAsync();
 
                 var responseList = mapper.Map<List<CasaResponse>>(datos);
 

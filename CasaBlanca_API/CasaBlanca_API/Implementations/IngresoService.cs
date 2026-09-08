@@ -65,8 +65,6 @@ namespace CasaBlanca_API.Implementations
 
                 string query = @"SELECT ingresos.id,
                                        inmueble.numerocasa,
-                                       inmueble.nombretitular + ' ' + inmueble.apellidostitular AS nombretitular,
-                                       inmueble.nombreocupante + ' ' + inmueble.apellidosocupante AS nombreocupante,
                                        ingresos.fecharecepcion,
                                        ingresos.numerorecibo,
                                        concepto.concepto,
@@ -140,8 +138,6 @@ namespace CasaBlanca_API.Implementations
                 const string query = @"SELECT ingresos.id,
                             ingresos.IdCasa,
                             inmueble.numerocasa,
-                            inmueble.nombretitular + ' ' + inmueble.apellidostitular AS nombretitular,
-                            inmueble.nombreocupante + ' ' + inmueble.apellidosocupante AS nombreocupante,
                             ingresos.fecharecepcion,
                             ingresos.numerorecibo,
                             concepto.id as IdConcepto,

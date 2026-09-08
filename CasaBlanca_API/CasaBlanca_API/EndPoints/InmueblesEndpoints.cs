@@ -2,6 +2,7 @@
 using CasaBlanca_API.Models;
 using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casa;
+using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.shared;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text.RegularExpressions;
@@ -14,7 +15,7 @@ public static class InmueblesEndpoints
     {
         var connectionString = app.Configuration.GetConnectionString("DefultConnection");
 
-        app.MapGet("/api/GetHouses", GetAllHouses).WithName("GetHouses").Produces<IEnumerable<ListaCasasDTO>>(200);
+        app.MapGet("/api/GetHouses", GetAllHouses).WithName("GetHouses").Produces<IEnumerable<CatalogoCasasDTO>>(200);
         app.MapGet("/api/GetHouseById/{id}", GetHouseById).WithName("GetHouseById").Produces<InmuebleReadDTO>(200).Produces(400).Produces(404).Produces(500);
         app.MapPost("/api/UpdateHouse", UpdateHouse).WithName("UpdateHouse").Accepts<UpdateCasaDTO>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
         app.MapPost("/api/CreateHouse", CreateHuse).WithName("CreateHouse").Produces<string>(200).Produces<string>(400).Produces<string>(409).Produces<string>(500);
@@ -66,7 +67,7 @@ public static class InmueblesEndpoints
     {
         try
         {
-            IEnumerable<ListaCasasDTO> datos = await inmuebleService.GetInmueblesAsync();
+            IEnumerable<CatalogoCasasDTO> datos = await inmuebleService.GetInmueblesAsync();
             return Results.Ok(datos);
         }
         catch (Exception ex)

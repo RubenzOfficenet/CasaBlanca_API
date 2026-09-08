@@ -12,17 +12,9 @@ namespace CasaBlanca_API.EndPoints
     {
         public static void ConfigureEventosIngresosEndPoint(this WebApplication app)
         {   
-            app.MapGet("/api/GetEventoingresos", GetEventoingresos)
-                .WithName("GetEventoingresos")
-                .Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status500InternalServerError); 
-
+            app.MapGet("/api/GetEventoingresos", GetEventoingresos).WithName("GetEventoingresos").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError); 
             app.MapPost("/api/AddEventoIngreso", AddEventoIngreso).WithName("AddEventoIngreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
-            app.MapGet("/api/GetEventoingresosById", GetEventoingresosById)
-                .WithName("GetEventoingresosById")
-                .Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status500InternalServerError);
-
+            app.MapGet("/api/GetEventoingresosById", GetEventoingresosById).WithName("GetEventoingresosById").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
             app.MapPut("/api/UpdateEventoingreso", UpdateEventoingreso).WithName("UpdateEventoingreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
             app.MapPut("/api/DeleteEventoIngreso", DeleteEventoIngreso).WithName("DeleteEventoIngreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
         }

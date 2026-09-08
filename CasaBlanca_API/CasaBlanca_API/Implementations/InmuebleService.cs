@@ -1,6 +1,7 @@
 ﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casa;
+using CasaBlanca_API.Models.DTO.Casas;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Linq.Expressions;
@@ -159,7 +160,7 @@ public  class InmuebleService : IInmuebleService
     }
 
 
-    public async Task<IEnumerable<ListaCasasDTO>> GetInmueblesAsync()
+    public async Task<IEnumerable<CatalogoCasasDTO>> GetInmueblesAsync()
     {
         try
         {
@@ -173,25 +174,16 @@ public  class InmuebleService : IInmuebleService
                                inmueble.idestadoocupacion,
                                estadoocupacion.estadoinicialocupacion,
                                inmueble.numerohabitantes,
-                               inmueble.observaciones,
-                               casa_usuario.idusuario,
-                               usuario.nombre,
-                               usuario.apellidos,
-                               casa_usuario.idcasa,
-                               roluser.rol,
-                               casa_usuario.idrol
+                               inmueble.observaciones
                         FROM   inmueble
                                INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
-                               INNER JOIN estadoocupacion ON inmueble.idestadoocupacion = estadoocupacion.id
-                               LEFT JOIN casa_usuario ON inmueble.id = casa_usuario.idcasa
-                               LEFT JOIN usuario ON casa_usuario.idusuario = usuario.id
-                               LEFT JOIN roluser ON casa_usuario.idtiporelacion = roluser.id 
+                               INNER JOIN estadoocupacion ON inmueble.idestadoocupacion = estadoocupacion.id 
                         ORDER BY
-                            ubicacion.nombreubicacion";
+                            inmueble.numerocasa";
 
             using (var connection = new SqlConnection(connectionString))
             {
-                IEnumerable<ListaCasasDTO> inmuebles = await connection.QueryAsync<ListaCasasDTO>(query);
+                IEnumerable<CatalogoCasasDTO> inmuebles = await connection.QueryAsync<CatalogoCasasDTO>(query);
                 return inmuebles;
             }
         }
@@ -209,10 +201,7 @@ public  class InmuebleService : IInmuebleService
             var connectionString = _configuration.GetConnectionString("DefultConnection");
 
             string query = @"SELECT id,
-                               numerocasa,
-                               idubicacion,
-                               nombretitular + ' ' + apellidostitular as nombretitular,
-                               nombreocupante + ' ' + apellidosocupante as nombreocupante
+                               numerocasa
                         FROM   inmueble
                         WHERE  ( idubicacion = @idubicacion) ";
 

@@ -1,10 +1,16 @@
 ﻿
 using AutoMapper;
+using CasaBlanca_API.Implementations;
 using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models;
+using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Usuario;
 using CasaBlanca_API.shared;
+using Dapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace CasaBlanca_API.EndPoints
 {
@@ -14,9 +20,10 @@ namespace CasaBlanca_API.EndPoints
         {
             var connectionString = app.Configuration.GetConnectionString("DefultConnection");
             
-            app.MapGet("/api/Users", GetAllUsers).WithName("GetUsers").Produces<IEnumerable<Usuario>>(200).Produces(500);
-            app.MapGet("/api/Users/{id}", GetUserById).WithName("GetUserById").Produces<Usuario>(200).Produces(404).Produces(500);
-            app.MapPost("/api/NewUser", CreateUser).WithName("CreateUser").Produces<Usuario>(StatusCodes.Status201Created).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status500InternalServerError);
+            app.MapGet("/api/GetAllUsers", GetAllUsers).WithName("GetUsers").Produces<IEnumerable<GetUsuariosResponse>>(200).Produces(500);
+            app.MapGet("/api/GetUserById/{id}", GetUserById).WithName("GetUserById").Produces<UsuarioResponse>(200).Produces(404).Produces(500);
+            app.MapPost("/api/CreateUser", CreateUser).WithName("CreateUser").Produces<Usuario>(StatusCodes.Status201Created).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status500InternalServerError);
+            app.MapPut("/api/UpdateUsuario", UpdateUsuario).WithName("UpdateUsuario").Accepts<UsuarioEditRequest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
         }
 
         public async static Task<IResult> GetAllUsers(IUsuarioService service)
@@ -32,11 +39,12 @@ namespace CasaBlanca_API.EndPoints
             }
         }
 
-        public async static Task<IResult> GetUserById(CasaBlancaDbContext db, int id)
+        public async static Task<IResult> GetUserById(int id, IMapper mapper, IUsuarioService usuarioService)
         {
             try
             {
-                var user = await db.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+                var user = await usuarioService.GetUsuarioByIdAsync(id);
+
                 if (user == null)
                     return Results.NotFound($"User with id {id} not found.");
 
@@ -44,11 +52,11 @@ namespace CasaBlanca_API.EndPoints
             }
             catch (Exception ex)
             {
-                return Results.InternalServerError($"An error occurred: {ex.Message}");
+                return Results.Problem($"An error occurred: {ex.Message}", statusCode: 500);
             }
         }
 
-        static async Task<IResult> CreateUser(UsuarioRequest usuarioRequest, CasaBlancaDbContext db, IMapper mapper)
+        public static async Task<IResult> CreateUser(UsuarioRequest usuarioRequest, IMapper mapper, IUsuarioService usuarioService)
         {
             try
             {
@@ -62,23 +70,12 @@ namespace CasaBlanca_API.EndPoints
                 if (string.IsNullOrWhiteSpace(usuarioRequest.CelularUsuario))
                     return Results.BadRequest("El celular es obligatorio.");
 
-                // Verificar si el correo ya existe
-                bool existe = await db.Usuarios.AnyAsync(x => x.EmailUsuario == usuarioRequest.EmailUsuario);
 
-                if (existe)
-                    return Results.BadRequest("Ya existe un usuario con ese correo electrónico.");
+                var result = usuarioService.AddUsuarioAsync(usuarioRequest);
 
-                var usuariMaapper = mapper.Map<Usuario>(usuarioRequest);
-                usuariMaapper.Password = PasswordHasher.HashPassword(usuariMaapper.Password);
-                usuariMaapper.IdEstatus = 1; // Asignar un valor predeterminado para IdEstatus
-                usuariMaapper.DateAdded = DateTime.Now;
-                usuariMaapper.DateUpdated = null;
+                return Results.Ok(result.Id);
 
-                db.Usuarios.Add(usuariMaapper);
-                await db.SaveChangesAsync();
-
-                return Results.Created($"/api/Users/{usuariMaapper.Id}", usuariMaapper);
-                
+                // return Results.Created($"/api/Users/{usuario.Id}", usuario);    
             }
             catch (Exception ex)
             {
@@ -88,6 +85,33 @@ namespace CasaBlanca_API.EndPoints
                     title: "Error al crear el usuario");
             }
         }
+
+        public async static Task<IResult> UpdateUsuario(UsuarioEditRequest usuarioUpdate, IUsuarioService usuarioService)
+        {
+            try
+            {
+                if (usuarioUpdate.Id <= 0)
+                    return Results.BadRequest("Invalid user data Id is required.");
+
+                // Optional: validate NumeroCasa
+                if (usuarioUpdate.IdInmueble == 0)
+                    return Results.BadRequest("Numero de Casa is required.");
+
+                var rows = await usuarioService.ActualizarUsuarioAsync(usuarioUpdate);
+
+
+                return TypedResults.Created($"/api/GetUserById/{usuarioUpdate.Id}", usuarioUpdate);
+
+                //return Results.Created($"/api/users/{usuarioUpdate.Id}", new { Id = usuarioUpdate.Id });
+
+                //return Results.Ok(rows);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
 
     }
 }

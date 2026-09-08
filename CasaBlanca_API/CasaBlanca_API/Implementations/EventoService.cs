@@ -30,7 +30,7 @@ namespace CasaBlanca_API.Implementations
 
                                     SELECT eventosingreso.id, eventosingreso.idinmueble, eventosingreso.idestatusevento,
                                            inmueble.idubicacion, ubicacion.nombreubicacion, inmueble.numerocasa,
-                                           eventosingreso.fechaevento, inmueble.nombretitular, inmueble.apellidostitular,
+                                           eventosingreso.fechaevento, 
                                            eventosingreso.recibonumero, eventosingreso.fechapago, eventosingreso.apartado,
                                            eventosingreso.liquida, eventosingreso.luz, eventosingreso.depositogarantia,
                                            eventosingreso.limpiezadomingo, eventosingreso.rentainmobiliario,
@@ -149,9 +149,6 @@ namespace CasaBlanca_API.Implementations
                                    ubicacion.nombreubicacion,
                                    inmueble.numerocasa,
                                    eventosingreso.fechaevento,
-                                   inmueble.nombretitular,
-                                   inmueble.apellidostitular,
-                                   inmueble.nombreOcupante,
                                    eventosingreso.recibonumero,
                                    eventosingreso.fechapago,
                                    eventosingreso.apartado,
