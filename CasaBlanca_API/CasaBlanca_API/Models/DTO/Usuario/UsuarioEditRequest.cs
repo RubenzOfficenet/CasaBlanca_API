@@ -17,5 +17,7 @@
         public int? IdInmueble { get; set; }
 
         public int IdTipoRelacion { get; set; }
+
+        public int IdUbicacion { get; set; }
     }
 }
