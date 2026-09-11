@@ -116,13 +116,13 @@ namespace CasaBlanca_API.Implementations
                                 Apellidos = usuarioRequest.ApellidosUsuario,
                                 email = usuarioRequest.EmailUsuario,
                                 celular = usuarioRequest.CelularUsuario,
-                                password = PasswordHasher.HashPassword(usuarioRequest.Password),
+                                password = PasswordHasher.GenerateFromSeed(usuarioRequest.Password),
                                 IdEstatus = 1,
                                 IdInmueble = usuarioRequest.IdInmueble,
                                 IdRol = usuarioRequest.IdRol
                             };
 
-                            // Se pasa el parámetro transaction a las llamadas de Dapper
+                            // Se pasa el parámetro transaction a las llamadas de Dapper    
                             int newId = await connection.ExecuteScalarAsync<int>(queryUsuario, parametersUsuario, transaction);
 
                             // 3. Insertar relación Casa_Usuario

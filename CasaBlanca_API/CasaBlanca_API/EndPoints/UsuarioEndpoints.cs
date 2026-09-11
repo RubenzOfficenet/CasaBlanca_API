@@ -70,6 +70,11 @@ namespace CasaBlanca_API.EndPoints
                 if (string.IsNullOrWhiteSpace(usuarioRequest.CelularUsuario))
                     return Results.BadRequest("El celular es obligatorio.");
 
+                string textoAleatorio = TextGeneratorService.GenerateRandomTextChars();
+
+                string passwordGenerated = PasswordHasher.GenerateFromSeed(textoAleatorio);
+
+                usuarioRequest.Password = passwordGenerated;
 
                 var result = usuarioService.AddUsuarioAsync(usuarioRequest);
 

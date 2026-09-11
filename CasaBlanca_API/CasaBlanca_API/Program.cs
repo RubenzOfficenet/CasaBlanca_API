@@ -74,5 +74,6 @@ app.ConfigureEgresosEndPoints();
 app.ConfigureEventosIngresosEndPoint();
 app.ConfigureEventosEgresosEndPoint();
 app.ConfigureResumenAnaliticoEndPoint();
+app.ConfigurePasswordEndPoint();
 
 app.Run();
