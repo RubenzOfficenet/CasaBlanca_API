@@ -19,5 +19,6 @@
         public int? IdInmueble { get; set; }
 
         public int IdTipoRelacion { get; set; }
+        public bool DebeCambiarPassword { get; set; }
     }
 }

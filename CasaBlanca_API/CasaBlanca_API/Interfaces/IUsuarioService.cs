@@ -8,5 +8,7 @@ namespace CasaBlanca_API.Interfaces
         Task<IResult> AddUsuarioAsync(UsuarioRequest usuarioRequest);
         Task<IResult> GetUsuarioByIdAsync(int Id);
         Task<IResult> ActualizarUsuarioAsync(UsuarioEditRequest usuario);
+        Task<LoginResponseDTO> GetUserByEmailAndPasswordAsync(string email, string password);
+        Task<IResult> ActualizarUsuarioPasswordAsync(UsuarioUpdatePasswordRuquest usuario);
     }
 }

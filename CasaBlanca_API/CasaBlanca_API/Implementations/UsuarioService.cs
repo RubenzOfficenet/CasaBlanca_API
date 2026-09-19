@@ -7,7 +7,10 @@ using CasaBlanca_API.Models.DTO.Usuario;
 using CasaBlanca_API.shared;
 using Dapper;
 using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
+using System.Linq.Expressions;
 
 namespace CasaBlanca_API.Implementations
 {
@@ -40,7 +43,8 @@ namespace CasaBlanca_API.Implementations
                                    casa_usuario.idtiporelacion,
                                    tiporelacion.tiporelacion,
                                    usuario.idestatus,
-                                   estatus.estatus
+                                   estatus.estatus,
+                                    usuario.DebeCambiarPassword
                             FROM   usuario
                                    INNER JOIN casa_usuario ON usuario.id = casa_usuario.idusuario
                                    INNER JOIN roluser ON casa_usuario.idrol = roluser.id
@@ -74,7 +78,7 @@ namespace CasaBlanca_API.Implementations
                 {
                     return Results.Problem(
                         detail: "La cadena de conexión 'DefaultConnection' no está configurada.",
-                        statusCode: 500);
+                        statusCode: StatusCodes.Status500InternalServerError);
                 }
 
                 using (var connection = new SqlConnection(connectionString))
@@ -86,7 +90,12 @@ namespace CasaBlanca_API.Implementations
                     int existe = await connection.ExecuteScalarAsync<int>(sqlCheck, new { EmailUsuario = usuarioRequest.EmailUsuario });
 
                     if (existe > 0)
-                        return Results.BadRequest("Ya existe un usuario con ese correo electrónico.");
+                    {
+                        return Results.Problem(
+                        detail: "Ya existe un usuario con ese correo electrónico.",
+                        statusCode: StatusCodes.Status400BadRequest);
+                    }
+
 
                     // Iniciamos la transacción explícita
                     using (var transaction = connection.BeginTransaction())
@@ -100,14 +109,16 @@ namespace CasaBlanca_API.Implementations
                                                    ,email
                                                    ,celular
                                                    ,password
-                                                   ,IdEstatus)
+                                                   ,IdEstatus
+                                                    ,DebeCambiarPassword)
                                              VALUES
                                                    (@Nombre
                                                    ,@Apellidos
                                                    ,@email
                                                    ,@celular
                                                    ,@password
-                                                   ,@IdEstatus)
+                                                   ,@IdEstatus
+                                                   ,@DebeCambiarPassword)
                                             SELECT CAST(SCOPE_IDENTITY() as int);";
                             
                             var parametersUsuario = new
@@ -116,10 +127,11 @@ namespace CasaBlanca_API.Implementations
                                 Apellidos = usuarioRequest.ApellidosUsuario,
                                 email = usuarioRequest.EmailUsuario,
                                 celular = usuarioRequest.CelularUsuario,
-                                password = PasswordHasher.GenerateFromSeed(usuarioRequest.Password),
+                                password = usuarioRequest.Password,
                                 IdEstatus = 1,
                                 IdInmueble = usuarioRequest.IdInmueble,
-                                IdRol = usuarioRequest.IdRol
+                                IdRol = usuarioRequest.IdRol,
+                                DebeCambiarPassword = usuarioRequest.DebeCambiarPassword
                             };
 
                             // Se pasa el parámetro transaction a las llamadas de Dapper    
@@ -155,13 +167,20 @@ namespace CasaBlanca_API.Implementations
                             transaction.Commit();
 
                             //return Results.Created($"/api/users/{newId}", new { Id = newId });
-                            return Results.Ok();
+                            return Results.Problem(
+                                detail : "Usuario procesado correctamente",
+                                statusCode : StatusCodes.Status200OK
+                            );
                         }
                         catch
                         {
                             // Ante cualquier error durante las inserciones, revertimos los cambios
                             transaction.Rollback();
-                            throw; // Re-lanzamos la excepción para que sea capturada por el catch principal
+                            return Results.Problem(
+                                detail: "El usuario no pudo guardarse correctamente",
+                                statusCode: StatusCodes.Status400BadRequest
+                            );
+
                         }
                     }
                 }
@@ -193,7 +212,8 @@ namespace CasaBlanca_API.Implementations
                                     casa_usuario.idtiporelacion,
                                     tiporelacion.tiporelacion,
                                     usuario.idestatus,
-                                    estatus.estatus
+                                    estatus.estatus,
+                                    usuario.DebeCambiarPassword
                             FROM   usuario
                                     INNER JOIN casa_usuario ON usuario.id = casa_usuario.idusuario
                                     INNER JOIN roluser ON casa_usuario.idrol = roluser.id
@@ -219,6 +239,33 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
+        public async Task<LoginResponseDTO> GetUserByEmailAndPasswordAsync(string email, string password)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"SELECT id, email, password, DebeCambiarPassword 
+                        FROM usuario 
+                        WHERE email = @email 
+                        AND password = @password;";
+
+                using var connection = new SqlConnection(connectionString);
+
+                LoginResponseDTO? user = await connection.QueryFirstOrDefaultAsync<LoginResponseDTO>(query, new { email, password });
+
+                if (user == null)
+                {
+                    return null;
+                };
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<IResult> ActualizarUsuarioAsync(UsuarioEditRequest usuario)
         {
@@ -255,6 +302,7 @@ namespace CasaBlanca_API.Implementations
                                                   ,Apellidos = @Apellidos
                                                   ,email = @email
                                                   ,celular = @celular
+                                                  ,DebeCambiarPassword = @DebeCambiarPassword
                                                   ,LastUpdate = getdate()
                                              WHERE 
                                                 Id = @id";
@@ -310,5 +358,48 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
+        public async Task<IResult> ActualizarUsuarioPasswordAsync(UsuarioUpdatePasswordRuquest usuario)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    return Results.Problem(
+                        detail: "La cadena de conexión 'DefaultConnection' no está configurada.",
+                        statusCode: 500);
+                }
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    string passwordEnc = PasswordHasher.GenerateFromSeed(usuario.Password ?? "");
+
+
+                    string queryUsuario = @"UPDATE usuario SET
+	                                        password = @password,
+	                                        DebeCambiarPassword = 0
+                                        WHERE 
+	                                        id = @id";
+
+                    var parametersUsuario = new
+                    {
+                        id = usuario.Id,
+                        Password = passwordEnc
+                    };
+
+                    // Se pasa el parámetro transaction a las llamadas de Dapper
+                    await connection.ExecuteAsync(queryUsuario, parametersUsuario);
+
+                    return Results.Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(ex.Message, statusCode: 500);
+            }
+        }
+
     }
-}
+
+} // end class

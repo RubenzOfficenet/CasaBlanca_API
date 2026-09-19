@@ -1,4 +1,6 @@
-﻿namespace CasaBlanca_API.Models.DTO.Usuario
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace CasaBlanca_API.Models.DTO.Usuario
 {
     public class GetUsuariosResponse
     {
@@ -23,6 +25,7 @@
         // Datos de estatus
         public int IdEstatus { get; set; }
         public string Estatus { get; set; } = string.Empty;
+        public bool DebeCambiarPassword { get; set; }
     }
 
 

@@ -16,5 +16,6 @@
         public int IdRol { get; set; }
         public string Rol { get; set; } = string.Empty;
         public bool Borrado { get; set; }
+        public bool DebeCambiarPassword { get; set; }
     }
 }

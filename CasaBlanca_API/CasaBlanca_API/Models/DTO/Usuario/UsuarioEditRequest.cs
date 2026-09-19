@@ -19,5 +19,6 @@
         public int IdTipoRelacion { get; set; }
 
         public int IdUbicacion { get; set; }
+        public bool DebeCambiarPassword { get; set; }
     }
 }

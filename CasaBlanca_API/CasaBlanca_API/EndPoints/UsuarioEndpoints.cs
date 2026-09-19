@@ -22,8 +22,10 @@ namespace CasaBlanca_API.EndPoints
             
             app.MapGet("/api/GetAllUsers", GetAllUsers).WithName("GetUsers").Produces<IEnumerable<GetUsuariosResponse>>(200).Produces(500);
             app.MapGet("/api/GetUserById/{id}", GetUserById).WithName("GetUserById").Produces<UsuarioResponse>(200).Produces(404).Produces(500);
-            app.MapPost("/api/CreateUser", CreateUser).WithName("CreateUser").Produces<Usuario>(StatusCodes.Status201Created).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status500InternalServerError);
+            app.MapPost("/api/CreateUser", CreateUser).WithName("CreateUser").Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status500InternalServerError);
             app.MapPut("/api/UpdateUsuario", UpdateUsuario).WithName("UpdateUsuario").Accepts<UsuarioEditRequest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
+            app.MapGet("/api/GetUserByEmailAndPassword", GetUserByEmailAndPassword).WithName("GetUserByEmailAndPassword").Produces<LoginResponseDTO>(200).Produces(404).Produces(500);
+            app.MapPut("/api/UpdatePassword", UpdatePassword).WithName("UpdatePassword").Accepts<UsuarioUpdatePasswordRuquest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
         }
 
         public async static Task<IResult> GetAllUsers(IUsuarioService service)
@@ -56,6 +58,22 @@ namespace CasaBlanca_API.EndPoints
             }
         }
 
+        public async static Task<IResult> GetUserByEmailAndPassword(string email, string password, IMapper mapper, IUsuarioService usuarioService)
+        {
+            try
+            {
+                string passwoordEnc = PasswordHasher.GenerateFromSeed(password);
+
+                LoginResponseDTO? result = await usuarioService.GetUserByEmailAndPasswordAsync(email, passwoordEnc);
+
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"An error occurred: {ex.Message}", statusCode: 500);
+            }
+        }
+
         public static async Task<IResult> CreateUser(UsuarioRequest usuarioRequest, IMapper mapper, IUsuarioService usuarioService)
         {
             try
@@ -76,9 +94,28 @@ namespace CasaBlanca_API.EndPoints
 
                 usuarioRequest.Password = passwordGenerated;
 
-                var result = usuarioService.AddUsuarioAsync(usuarioRequest);
 
-                return Results.Ok(result.Id);
+                // Add new user
+                IResult result = await usuarioService.AddUsuarioAsync(usuarioRequest);
+
+                // valida si hay un badrequest
+                if (result is IStatusCodeHttpResult { StatusCode: 400 } && result is IValueHttpResult valueResult)
+                {
+                    return Results.Problem(
+                     detail: "Datos incorrectos y duplicados.",
+                     statusCode: StatusCodes.Status400BadRequest);
+                }
+                
+
+                // send email
+                var emailCore = new EmailCore();
+
+                await emailCore.SendEmail(textoAleatorio, usuarioRequest.EmailUsuario, "Alta de nuevo usuario");
+
+
+                return Results.Problem(
+                     detail: "El usuario se agregó correctamente.",
+                     statusCode: StatusCodes.Status200OK);
 
                 // return Results.Created($"/api/Users/{usuario.Id}", usuario);    
             }
@@ -110,6 +147,30 @@ namespace CasaBlanca_API.EndPoints
                 //return Results.Created($"/api/users/{usuarioUpdate.Id}", new { Id = usuarioUpdate.Id });
 
                 //return Results.Ok(rows);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        public async static Task<IResult> UpdatePassword(UsuarioUpdatePasswordRuquest usuarioUpdatePswd, IUsuarioService usuarioService)
+        {
+            try
+            {
+                if (usuarioUpdatePswd.Id <= 0)
+                    return Results.BadRequest("Invalid user data Id is required.");
+
+                if (String.IsNullOrEmpty(usuarioUpdatePswd.Password))
+                    return Results.BadRequest("Invalid user password is required.");
+                    
+                var rows = await usuarioService.ActualizarUsuarioPasswordAsync(usuarioUpdatePswd);
+
+
+                return Results.Problem(
+                                detail: "La contraseña se actualizó correctamente",
+                                statusCode: 200);
+                
             }
             catch (Exception ex)
             {
