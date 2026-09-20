@@ -245,10 +245,20 @@ namespace CasaBlanca_API.Implementations
             {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-                string query = @"SELECT id, email, password, DebeCambiarPassword 
-                        FROM usuario 
-                        WHERE email = @email 
-                        AND password = @password;";
+                string query = @"SELECT casa_usuario.id,
+                                   casa_usuario.idusuario,
+                                   usuario.nombre,
+                                   usuario.apellidos,
+                                   usuario.email,
+                                   usuario.password,
+                                   casa_usuario.idrol,
+                                   roluser.rol,
+                                   usuario.DebeCambiarPassword
+                            FROM   casa_usuario 
+                            INNER JOIN usuario ON casa_usuario.idusuario = usuario.id
+                            INNER JOIN roluser ON casa_usuario.idrol = roluser.id 
+                            WHERE usuario.email = @email 
+                            AND usuario.password = @password;";
 
                 using var connection = new SqlConnection(connectionString);
 
@@ -362,6 +372,7 @@ namespace CasaBlanca_API.Implementations
         {
             try
             {
+                // 1. Corrección de la clave de conexión
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
                 if (string.IsNullOrEmpty(connectionString))
@@ -373,25 +384,31 @@ namespace CasaBlanca_API.Implementations
 
                 using (var connection = new SqlConnection(connectionString))
                 {
+                    // 2. Abrir la conexión explícitamente
+                    await connection.OpenAsync();
+
                     string passwordEnc = PasswordHasher.GenerateFromSeed(usuario.Password ?? "");
 
-
-                    string queryUsuario = @"UPDATE usuario SET
-	                                        password = @password,
-	                                        DebeCambiarPassword = 0
-                                        WHERE 
-	                                        id = @id";
+                    string queryUsuario = @"UPDATE usuario 
+                                    SET password = @password, 
+                                        DebeCambiarPassword = 0 
+                                    WHERE id = Id";
 
                     var parametersUsuario = new
                     {
                         id = usuario.Id,
-                        Password = passwordEnc
+                        password = passwordEnc
                     };
 
-                    // Se pasa el parámetro transaction a las llamadas de Dapper
-                    await connection.ExecuteAsync(queryUsuario, parametersUsuario);
+                    // 3. Ejecución del query
+                    int rowsAffected = await connection.ExecuteAsync(queryUsuario, parametersUsuario);
 
-                    return Results.Ok();
+                    if (rowsAffected == 0)
+                    {
+                        return Results.NotFound(new { detail = "No se encontró ningún usuario con el Id especificado." });
+                    }
+
+                    return Results.Ok(new { detail = "La contraseña se actualizó correctamente." });
                 }
             }
             catch (Exception ex)
