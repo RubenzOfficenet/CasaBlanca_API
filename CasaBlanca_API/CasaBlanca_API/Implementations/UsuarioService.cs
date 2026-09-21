@@ -246,7 +246,7 @@ namespace CasaBlanca_API.Implementations
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
                 string query = @"SELECT casa_usuario.id,
-                                   casa_usuario.idusuario,
+                                   casa_usuario.idUsuario,
                                    usuario.nombre,
                                    usuario.apellidos,
                                    usuario.email,
@@ -392,7 +392,7 @@ namespace CasaBlanca_API.Implementations
                     string queryUsuario = @"UPDATE usuario 
                                     SET password = @password, 
                                         DebeCambiarPassword = 0 
-                                    WHERE id = Id";
+                                    WHERE id = @Id";
 
                     var parametersUsuario = new
                     {
