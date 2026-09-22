@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using CasaBlanca_API.Interfaces;
+using CasaBlanca_API.Models;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Ingresos;
 using Dapper;
@@ -55,14 +56,43 @@ namespace CasaBlanca_API.Implementations
 
         }
 
-        public async Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync(int year, int month)
+        public async Task<IEnumerable<IngresoResponse>> GetAllIngresosAsync(int year, int month, string rol, int IdUsuario)
         {
             try
             {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-                
+                string rolusuario = string.Empty;
+                if (rol != "Administrador")
+                {
+                    rolusuario = $" AND(casa_usuario.idusuario = {IdUsuario}) ";
+                }
 
+                string query = @$"SELECT ingresos.id,
+                                   inmueble.numerocasa,
+                                   ingresos.fecharecepcion,
+                                   ingresos.numerorecibo,
+                                   concepto.concepto,
+                                   ingresos.fechaconcepto,
+                                   ingresos.monto,
+                                   ingresos.observaciones,
+                                   casa_usuario.idrol,
+                                   roluser.rol,
+                                   casa_usuario.idusuario,
+                                   Sum(ingresos.monto) OVER () AS totalMonto
+                            FROM   ingresos
+                                INNER JOIN inmueble ON ingresos.idcasa = inmueble.id
+                                INNER JOIN concepto ON ingresos.idconcepto = concepto.id
+                                INNER JOIN casa_usuario ON inmueble.id = casa_usuario.idcasa
+                                INNER JOIN roluser ON casa_usuario.idrol = roluser.id
+                            WHERE ( Year(ingresos.fecharecepcion) = @anio )AND ( Month(ingresos.fecharecepcion) = @mes )
+                                AND ( ingresos.borrado = 0 ) OR ( ingresos.borrado = 0 )
+                                AND ( Year(ingresos.fechaconcepto) = @anio )
+                                AND ( Month(ingresos.fechaconcepto) = @mes )
+                                {rolusuario}
+                             ORDER  BY ingresos.fecharecepcion ";
+
+                /*
                 string query = @"SELECT ingresos.id,
                                        inmueble.numerocasa,
                                        ingresos.fecharecepcion,
@@ -81,8 +111,15 @@ namespace CasaBlanca_API.Implementations
                                       )
                                   AND ingresos.borrado = 0
                                 ORDER BY ingresos.fecharecepcion;";
+                */
 
-                var parameters = new { anio = year, mes = month };
+
+                var parameters = new 
+                { 
+                    anio = year, 
+                    mes = month,
+                    idusuario = IdUsuario
+                };
 
                 using (var connection = new SqlConnection(connectionString))
                 {
