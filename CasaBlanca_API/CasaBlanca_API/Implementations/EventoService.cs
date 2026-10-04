@@ -105,6 +105,7 @@ namespace CasaBlanca_API.Implementations
                                    ,DepositoGarantia
                                    ,LimpiezaDomingo
                                    ,RentaInmobiliario
+                                   ,Borrado
                                    ,DateAdded
                                    ,LastUpdate)
                              VALUES
@@ -119,7 +120,8 @@ namespace CasaBlanca_API.Implementations
                                    ,@DepositoGarantia
                                    ,@LimpiezaDomingo
                                    ,@RentaInmobiliario
-                                   ,GETDATE()
+                                   ,0
+                                   ,getdate()
                                    ,null)";
 
                 using (var connection = new SqlConnection(connectionString))
