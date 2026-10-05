@@ -28,23 +28,24 @@ namespace CasaBlanca_API.Implementations
                                     DECLARE @fechaInicio DATE = DATEFROMPARTS(@anio, @mes, 1)
                                     DECLARE @fechaFin DATE = DATEADD(MONTH, 1, @fechaInicio)
 
-                                    SELECT eventosingreso.id, eventosingreso.idinmueble, eventosingreso.idestatusevento,
-                                           inmueble.idubicacion, ubicacion.nombreubicacion, inmueble.numerocasa,
-                                           eventosingreso.fechaevento, 
-                                           eventosingreso.recibonumero, eventosingreso.fechapago, eventosingreso.apartado,
-                                           eventosingreso.liquida, eventosingreso.luz, eventosingreso.depositogarantia,
-                                           eventosingreso.limpiezadomingo, eventosingreso.rentainmobiliario,
-                                           estatusevento.estatusevento,
-                                           eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario AS Total,
-                                           (SELECT COUNT(*) FROM EgresoEvento WHERE IdEventoIngreso = eventosingreso.id) AS TotalEgresos
-                                    FROM   eventosingreso
-                                           INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
-                                           INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
-                                           INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
-                                    WHERE  eventosingreso.fechaevento >= @fechaInicio
-                                           AND eventosingreso.fechaevento < @fechaFin
-                                           AND eventosingreso.Borrado = 0 
-                                    ORDER BY eventosingreso.fechaevento DESC";
+                                   SELECT ei.id, ei.idinmueble, ei.idestatusevento,
+                                            inmueble.idubicacion, ubicacion.nombreubicacion, inmueble.numerocasa,
+                                            ei.fechaevento, 
+                                            ei.recibonumero, ei.fechapago, ei.apartado,
+                                            ei.liquida, ei.luz, ei.depositogarantia,
+                                            ei.limpiezadomingo, ei.rentainmobiliario,
+                                            estatusevento.estatusevento,
+                                            ei.apartado + ei.liquida + ei.luz + ei.depositogarantia + ei.limpiezadomingo + ei.rentainmobiliario AS Total,
+                                            (SELECT COUNT(*) FROM EgresoEvento WHERE IdEventoIngreso = ei.id) AS TotalEgresos,
+                                            (select sum(montoEgreso) from  EgresoEvento where IdEventoIngreso = ei.Id) as TotalMontoEgresos
+                                    FROM   eventosingreso as ei
+                                            INNER JOIN inmueble ON ei.idinmueble = inmueble.id
+                                            INNER JOIN estatusevento ON ei.idestatusevento = estatusevento.id
+                                            INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                                    WHERE  ei.fechaevento >= @fechaInicio
+                                            AND ei.fechaevento < @fechaFin
+                                            AND ei.Borrado = 0 
+                                    ORDER BY ei.fechaevento DESC";
                 /*
                 //string query = @"SELECT eventosingreso.id,
                 //                   eventosingreso.idinmueble,

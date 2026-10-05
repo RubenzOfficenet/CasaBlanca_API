@@ -23,6 +23,8 @@
         public string? EstatusEvento { get; set; }
         public decimal Total { get; set; }
         public int TotalEgresos { get; set; }
+        public decimal TotalMontoEgresos { get; set; }
+
 
     }
 }
