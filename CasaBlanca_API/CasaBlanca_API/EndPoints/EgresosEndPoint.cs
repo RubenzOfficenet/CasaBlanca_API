@@ -1,10 +1,6 @@
-﻿using AutoMapper;
-using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models.DTO.Casas;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.Egresos;
-using CasaBlanca_API.Models.DTO.Ingresos;
-using Dapper;
-using Microsoft.Data.SqlClient;
+using Core.Mappy.Interfaces;
 
 namespace CasaBlanca_API.Implementations;
 

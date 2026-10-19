@@ -1,13 +1,11 @@
-﻿using AutoMapper;
+﻿using Core.Mappy.Interfaces;
 using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models;
-using CasaBlanca_API.Models.DTO;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Catalogo;
 using CasaBlanca_API.Models.DTO.Even_toEgreso;
 using CasaBlanca_API.Models.DTO.Rol;
 using CasaBlanca_API.Models.DTO.Ubicacion;
-using CasaBlanca_API.Models.DTO.Usuario;
+
 
 namespace CasaBlanca_API.EndPoints
 {

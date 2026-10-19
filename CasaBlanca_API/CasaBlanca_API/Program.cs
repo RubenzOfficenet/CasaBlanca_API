@@ -2,9 +2,14 @@
 using CasaBlanca_API.EndPoints;
 using CasaBlanca_API.Implementations;
 using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Mappings;
 using CasaBlanca_API.Models;
+using CasaBlanca_API.Models.DTO.Casa;
+using Core.Mappy;
+using Core.Mappy.Extensions;
+using Core.Mappy.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // AUTOMAPPER
-builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 
 // CORS
@@ -43,6 +48,7 @@ builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IEgresoEventoService, EgresoEventoService>();
 builder.Services.AddScoped<IEgresoAnaliticoService, EgresoAnaliticoService>();
 
+builder.Services.AddTransient<IMapper, Mapper>();
 
 
 // Register EF DbContext for Usuarios endpoints
@@ -51,8 +57,16 @@ builder.Services.AddDbContext<CasaBlancaDbContext>(options =>
 
 
 var app = builder.Build();
+
+var mapper = app.Services.GetRequiredService<IMapper>();
+
+// mapper DTOs
+mapper.RegisterMappings(typeof(CasaMappingProfile).Assembly);
+
+
 // Debe ir antes de MapControllers()
 app.UseCors("AngularPolicy");
+
 
 
 
@@ -65,6 +79,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 
 }
+
+//await app.ApplyMigration(builder.Environment);
+//app.MapControllers();
 
 app.UseHttpsRedirection();
 

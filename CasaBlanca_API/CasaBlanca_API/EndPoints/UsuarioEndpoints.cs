@@ -1,16 +1,8 @@
-﻿
-using AutoMapper;
-using CasaBlanca_API.Implementations;
-using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models;
-using CasaBlanca_API.Models.DTO;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.Usuario;
 using CasaBlanca_API.shared;
-using Dapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
+using Core.Mappy.Interfaces;
 
 namespace CasaBlanca_API.EndPoints
 {

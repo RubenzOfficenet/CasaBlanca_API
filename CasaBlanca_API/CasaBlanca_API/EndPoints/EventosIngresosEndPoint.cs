@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models.DTO.Casas;
-using CasaBlanca_API.Models.DTO.Egresos;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.Eventos;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using Core.Mappy.Interfaces;
 
 namespace CasaBlanca_API.EndPoints
 {

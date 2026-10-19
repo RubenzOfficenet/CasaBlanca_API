@@ -1,4 +1,6 @@
 <Solution>
-  <Folder Name="/Core.Mappy/" />
+  <Folder Name="/Core/">
+    <Project Path="Core.Mappy/Core.Mappy.csproj" Id="17248fb6-10e4-4fc9-97c5-fa46f33c0dfe" />
+  </Folder>
   <Project Path="CasaBlanca_API/CasaBlanca_API.csproj" />
 </Solution>

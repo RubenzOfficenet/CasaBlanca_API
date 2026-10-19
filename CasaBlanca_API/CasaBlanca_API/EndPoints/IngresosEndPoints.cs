@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using Azure.Core;
-using CasaBlanca_API.Implementations;
-using CasaBlanca_API.Interfaces;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.Casas;
 using CasaBlanca_API.Models.DTO.Ingresos;
-using System.Data;
+using Core.Mappy.Interfaces;
 
 namespace CasaBlanca_API.EndPoints
 {

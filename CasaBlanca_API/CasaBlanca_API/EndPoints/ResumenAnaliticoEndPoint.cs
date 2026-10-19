@@ -1,7 +1,6 @@
-﻿using AutoMapper;
-using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models.DTO.Egresos;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.ResumenAnalitico;
+using Core.Mappy.Interfaces;
 
 namespace CasaBlanca_API.EndPoints
 {

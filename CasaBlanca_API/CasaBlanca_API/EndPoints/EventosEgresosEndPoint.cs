@@ -1,9 +1,10 @@
-﻿using AutoMapper;
-using CasaBlanca_API.Interfaces;
-using CasaBlanca_API.Models;
+﻿using CasaBlanca_API.Interfaces;
 using CasaBlanca_API.Models.DTO.Even_toEgreso;
 using CasaBlanca_API.Models.DTO.EventoEgreso;
 using CasaBlanca_API.Models.DTO.Eventos;
+using Core.Mappy.Interfaces;
+
+
 
 namespace CasaBlanca_API.EndPoints
 {
