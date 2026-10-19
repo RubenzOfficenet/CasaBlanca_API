@@ -18,14 +18,16 @@ builder.Services.AddSwaggerGen();
 // AUTOMAPPER
 builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
-// CORS: allow the SPA running on https://localhost:7128 to call this API
+
 // CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularPolicy",
         policy =>
         {
-            policy.WithOrigins("http://localhost:61160")
+            policy.WithOrigins(
+                    "http://localhost:61160",
+                    "http://localhost:8080")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
