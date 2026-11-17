@@ -47,6 +47,7 @@ builder.Services.AddScoped<IEgresoService, EgresosService>();
 builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IEgresoEventoService, EgresoEventoService>();
 builder.Services.AddScoped<IEgresoAnaliticoService, EgresoAnaliticoService>();
+builder.Services.AddScoped<IEventosCalendarioService, EventosCalendarioService>();
 
 builder.Services.AddTransient<IMapper, Mapper>();
 
@@ -80,9 +81,6 @@ if (app.Environment.IsDevelopment())
 
 }
 
-//await app.ApplyMigration(builder.Environment);
-//app.MapControllers();
-
 app.UseHttpsRedirection();
 
 app.ConfigureInmueblesEndpoints();
@@ -94,5 +92,7 @@ app.ConfigureEventosIngresosEndPoint();
 app.ConfigureEventosEgresosEndPoint();
 app.ConfigureResumenAnaliticoEndPoint();
 app.ConfigurePasswordEndPoint();
+app.EventosCalendarioEndPoints();
+
 
 app.Run();

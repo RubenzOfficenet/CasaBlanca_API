@@ -15,6 +15,7 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GetEventoEgresos", GetEventoEgresos).WithName("GetEventoEgresos").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
             app.MapGet("/api/GetListaEventoEgresos", GetListaEventoEgresos).WithName("GetListaEventoEgresos").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
             app.MapPost("/api/AddEventoEgreso", AddEventoEgreso).WithName("AddEventoEgreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
+            
         }
 
         private static async Task<IResult> GetEventoEgresos(ICatalogosService eventoService)

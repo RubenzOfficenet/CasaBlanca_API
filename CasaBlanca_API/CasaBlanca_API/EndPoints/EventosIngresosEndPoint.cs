@@ -14,8 +14,28 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GetEventoingresosById", GetEventoingresosById).WithName("GetEventoingresosById").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
             app.MapPut("/api/UpdateEventoingreso", UpdateEventoingreso).WithName("UpdateEventoingreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
             app.MapPut("/api/DeleteEventoIngreso", DeleteEventoIngreso).WithName("DeleteEventoIngreso").Produces<int>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
+            app.MapGet("/api/GetEventosCalendar", GetEventosCalendar).WithName("GetEventosCalendar").Produces<IEnumerable<EventoResponse>>(StatusCodes.Status200OK).Produces(StatusCodes.Status500InternalServerError);
         }
-    
+
+
+        private static async Task<IResult> GetEventosCalendar(IEventoService eventoService, int year, int month)
+        {
+            try
+            {
+                IEnumerable<EventosCalendarResponse> result = await eventoService.GetCalendarEventsByYearMonthAsync(year, month);
+
+                return Results.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    detail: ex.Message,
+                    title: "Error al obtener los Eventos",
+                    statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
         private static async Task<IResult> GetEventoingresos(IEventoService eventoService, [AsParameters] EventoGetAllRequest eventoFiltro)
         {
             try

@@ -14,5 +14,6 @@
         public decimal DepositoGarantia { get; set; }
         public decimal LimpiezaDomingo { get; set; }
         public decimal RentaInmobiliario { get; set; }
+        public string? Comentarios { get; set; }
     }
 }

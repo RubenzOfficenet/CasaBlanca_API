@@ -21,6 +21,7 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GetConceptoIngreso", GetConceptoIngreso).WithName("GetConceptoIngreso").Produces<IEnumerable<CatalogoIngresoResponse>>(200);
             app.MapGet("/api/GetAllUbicaciones", GetAllUbicaciones).WithName("GetAllUbicaciones").Produces<IEnumerable<UbicacionResponseDTO>>(200);
             app.MapGet("/api/GetConceptoEventoEgreso", GetConceptoEventoEgreso).WithName("GetConceptoEventoEgreso").Produces<IEnumerable<ConceptoEventoEgresoDTO>>(200).Produces(500);
+            app.MapGet("/api/GetCasasByUbicacion", GetCasasByUbicacion).WithName("GetCasasByUbicacion").Produces<IEnumerable<CasaResponse>>(200);
         }
 
         public async static Task<IResult> GetAllUbicaciones(ICatalogosService service)
@@ -105,5 +106,22 @@ namespace CasaBlanca_API.EndPoints
                 return Results.InternalServerError($"An error occurred: {ex.Message}");
             }
         }
+
+        public async static Task<IResult> GetCasasByUbicacion(IInmuebleService inmuebleService, IMapper mapper,  int IdUbicacion)
+        {
+            try
+            {
+                IEnumerable<CatalogoCasasDTO> datos = await inmuebleService.GetCasasByUbicacionAsync(IdUbicacion);
+
+                var responseList = mapper.Map<List<CasaResponse>>(datos);
+
+                return Results.Ok(responseList);
+            }
+            catch (Exception ex)
+            {
+                return Results.InternalServerError($"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

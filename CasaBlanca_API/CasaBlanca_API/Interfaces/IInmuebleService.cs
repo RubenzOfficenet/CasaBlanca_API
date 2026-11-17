@@ -14,6 +14,7 @@ namespace CasaBlanca_API.Interfaces
         Task<InmuebleReadDTO?> GetInmuebleByIdAsync(int id);
         Task<int> UpdateInmuebleAsync(UpdateCasaDTO inmueble);
         Task<IEnumerable<CasaDto>> GetInmuebleByIdUbicacionAsync(int _idUbicacaion);
+        Task<IEnumerable<CatalogoCasasDTO>> GetCasasByUbicacionAsync(int idubicacion);
 
 
     }

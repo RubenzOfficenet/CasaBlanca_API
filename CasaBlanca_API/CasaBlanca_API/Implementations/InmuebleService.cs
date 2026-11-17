@@ -218,5 +218,41 @@ public  class InmuebleService : IInmuebleService
 
     }
 
+    public async Task<IEnumerable<CatalogoCasasDTO>> GetCasasByUbicacionAsync(int idubicacion)
+    {
+        try
+        {
+            var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+            string query = @"SELECT inmueble.id,
+                                                             inmueble.numerocasa,
+                               inmueble.idubicacion,
+                               ubicacion.nombreubicacion,
+                               inmueble.cuotademantenimientobase,
+                               inmueble.idestadoocupacion,
+                               estadoocupacion.estadoinicialocupacion,
+                               inmueble.numerohabitantes,
+                               inmueble.observaciones,
+                               Inmueble.IdUbicacion
+                        FROM   inmueble
+                               INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                               INNER JOIN estadoocupacion ON inmueble.idestadoocupacion = estadoocupacion.id 
+                        where Inmueble.IdUbicacion = @idubicacion
+                        ORDER BY
+                            inmueble.numerocasa";
+
+            using (var connection = new SqlConnection(connectionString))
+            {
+                IEnumerable<CatalogoCasasDTO> inmuebles = await connection.QueryAsync<CatalogoCasasDTO>(query, new { idUbicacion = idubicacion });
+                return inmuebles;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+
+    }
+
 
 }

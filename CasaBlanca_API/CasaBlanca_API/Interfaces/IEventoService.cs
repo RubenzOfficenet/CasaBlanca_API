@@ -9,5 +9,6 @@ namespace CasaBlanca_API.Interfaces
         Task<EventoResponse> GetEventoingresosById(int idEvento);
         Task<int> UpdateEventoingreso(EventoIngresoUpdateRequest eventoIngresoUpdateRequest);
         Task<int> DeleteEventoIngreso(int idEventoIntreso);
+        Task<IEnumerable<EventosCalendarResponse>> GetCalendarEventsByYearMonthAsync(int year, int month);
     }
 }

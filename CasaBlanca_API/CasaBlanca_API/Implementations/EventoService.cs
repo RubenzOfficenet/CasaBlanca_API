@@ -17,6 +17,9 @@ namespace CasaBlanca_API.Implementations
             _configuration = configuration;
         }
 
+
+        
+
         public async Task<IEnumerable<EventoResponse>> GetAllEventsAsync(EventoGetAllRequest eventoFiltro)
         {
             try
@@ -87,6 +90,57 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
+        public async Task<IEnumerable<EventosCalendarResponse>> GetCalendarEventsByYearMonthAsync(int year, int month)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"SELECT ei.id,
+                                   ei.idinmueble,
+                                   ei.idestatusevento,
+                                   ee.estatusevento,
+                                   ei.fechaevento,
+                                   ei.recibonumero,
+                                   ei.fechapago,
+                                   ei.apartado,
+                                   ei.liquida,
+                                   ei.luz,
+                                   ei.depositogarantia,
+                                   ei.limpiezadomingo,
+                                   ei.rentainmobiliario,
+                                   ei.comentarios,
+                                   cu.idcasa,
+                                   i.numerocasa,
+                                   i.idubicacion,
+                                   ub.nombreubicacion,
+                                   ei.borrado,
+                                   us.nombre,
+                                   us.apellidos,
+                                   ei.apartado,
+                                   ei.Liquida
+                            FROM   usuario AS u
+                                   INNER JOIN casa_usuario AS cu ON u.id = cu.idusuario
+                                   INNER JOIN inmueble AS i ON cu.idcasa = i.id
+                                   INNER JOIN eventosingreso AS ei INNER JOIN estatusevento AS ee ON ei.idestatusevento = ee.id ON i.id = ei.idinmueble
+                                   INNER JOIN ubicacion AS ub ON i.idubicacion = ub.id
+                                   INNER JOIN usuario us ON cu.idusuario = us.id
+                            WHERE  ( ei.borrado = 0 )
+                                   AND ( Year(ei.fechaevento) = @year )
+                                   AND ( Month(ei.fechaevento) = @month )
+                            ORDER  BY ei.fechaevento ";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    return await connection.QueryAsync<EventosCalendarResponse>(query, new { year, month });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<int> AddEventoAsync(EventoAddRequest eventoRequest)
         {
             try
@@ -108,7 +162,8 @@ namespace CasaBlanca_API.Implementations
                                    ,RentaInmobiliario
                                    ,Borrado
                                    ,DateAdded
-                                   ,LastUpdate)
+                                   ,LastUpdate
+                                   ,Comentarios)
                              VALUES
                                    (@IdInmueble
                                    ,@IdEstatusEvento
@@ -123,7 +178,8 @@ namespace CasaBlanca_API.Implementations
                                    ,@RentaInmobiliario
                                    ,0
                                    ,getdate()
-                                   ,null)";
+                                   ,null
+                                   ,@Comentarios)";
 
                 using (var connection = new SqlConnection(connectionString))
                 {
@@ -161,7 +217,8 @@ namespace CasaBlanca_API.Implementations
                                    eventosingreso.limpiezadomingo,
                                    eventosingreso.rentainmobiliario,
                                    estatusevento.estatusevento,
-                                   eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario as Total
+                                   eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario as Total,
+                                    eventosingreso.comentarios
                             FROM   eventosingreso
                                    INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
                                    INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
@@ -174,8 +231,8 @@ namespace CasaBlanca_API.Implementations
 
                 using (var connection = new SqlConnection(connectionString))
                 {
-                    EventoResponse result = await connection.QuerySingleOrDefaultAsync<EventoResponse>(query, parameters);
-                    return result;
+                    EventoResponse? result = await connection.QuerySingleOrDefaultAsync<EventoResponse>(query, parameters);
+                    return result ?? throw new InvalidOperationException("Evento no encontrado");
                 }
             }
             catch (Exception ex)
@@ -202,6 +259,7 @@ namespace CasaBlanca_API.Implementations
                                    ,DepositoGarantia = @DepositoGarantia
                                    ,LimpiezaDomingo = @LimpiezaDomingo
                                    ,RentaInmobiliario = @RentaInmobiliario
+                                   ,Comentarios = @Comentarios
                                    ,LastUpdate = GETDATE()
                                 WHERE Id = @Id";
 
