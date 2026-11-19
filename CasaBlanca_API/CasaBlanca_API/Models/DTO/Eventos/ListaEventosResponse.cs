@@ -10,6 +10,7 @@
         public int IdEstatusEvento { get; set; }
         public string EstatusEvento { get; set; } = string.Empty;
         public DateTime FechaEvento { get; set; }
+        public DateTime FechaPago { get; set; }
         public string? ReciboNumero { get; set; }
 
         // Propiedades de Usuario (pueden ser nulas debido al LEFT JOIN)
@@ -17,7 +18,11 @@
         public string? Apellidos { get; set; }
         public decimal apartado { get; set; }
         public decimal liquida { get; set; }
-
+        public decimal depositoGarantia { get; set; }
+        public decimal luz { get; set; }
+        public decimal limpiezaDomingo { get; set; }
+        public string? Comentarios { get; set; }
+        public decimal rentainmobiliario { get; set; }
 
         // Propiedad calculada útil para mostrar el nombre completo en la UI
         public string NombreCompletoUsuario =>

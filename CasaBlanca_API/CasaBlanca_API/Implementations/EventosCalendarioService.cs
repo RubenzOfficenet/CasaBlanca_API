@@ -21,33 +21,39 @@ namespace CasaBlanca_API.Implementations
             {
                 var connectionString = _configuration.GetConnectionString("DefultConnection");
 
-                string query = @"SELECT 
-                                    EventosIngreso.Id, 
-                                    EventosIngreso.IdInmueble, 
-                                    Inmueble.NumeroCasa, 
-                                    Inmueble.IdUbicacion, 
-                                    Ubicacion.NombreUbicacion, 
-                                    EventosIngreso.IdEstatusEvento, 
-                                    EstatusEvento.EstatusEvento, 
-                                    EventosIngreso.FechaEvento, 
-                                    EventosIngreso.ReciboNumero, 
-                                    Usuario.Nombre, 
-                                    Usuario.Apellidos,
-                                    EventosIngreso.Apartado,
-                                    EventosIngreso.Liquida  
-                                FROM EventosIngreso
-                                INNER JOIN Inmueble 
-                                    ON EventosIngreso.IdInmueble = Inmueble.Id
-                                INNER JOIN Ubicacion 
-                                    ON Inmueble.IdUbicacion = Ubicacion.Id
-                                INNER JOIN EstatusEvento 
-                                    ON EventosIngreso.IdEstatusEvento = EstatusEvento.Id
-                                LEFT JOIN Casa_Usuario 
-                                    ON Inmueble.Id = Casa_Usuario.idCasa
-                                LEFT JOIN Usuario 
-                                    ON Casa_Usuario.IdUsuario = Usuario.Id
+                string query = @"SELECT eventosingreso.id,
+                                   eventosingreso.idinmueble,
+                                   inmueble.numerocasa,
+                                   inmueble.idubicacion,
+                                   ubicacion.nombreubicacion,
+                                   eventosingreso.idestatusevento,
+                                   estatusevento.estatusevento,
+                                   eventosingreso.fechaevento,
+                                   eventosingreso.FechaPago,
+                                   eventosingreso.recibonumero,
+                                   usuario.nombre,
+                                   usuario.apellidos,
+                                   eventosingreso.apartado,
+                                   eventosingreso.liquida,
+                                   eventosingreso.luz,
+                                   eventosingreso.depositogarantia,
+                                   eventosingreso.limpiezadomingo,
+                                   eventosingreso.rentainmobiliario,
+                                   eventosingreso.comentarios
+                            FROM   eventosingreso
+                                   INNER JOIN inmueble
+                                           ON eventosingreso.idinmueble = inmueble.id
+                                   INNER JOIN ubicacion
+                                           ON inmueble.idubicacion = ubicacion.id
+                                   INNER JOIN estatusevento
+                                           ON eventosingreso.idestatusevento = estatusevento.id
+                                   LEFT OUTER JOIN casa_usuario
+                                                ON inmueble.id = casa_usuario.idcasa
+                                   LEFT OUTER JOIN usuario
+                                                ON casa_usuario.idusuario = usuario.id
                                 WHERE YEAR(EventosIngreso.FechaEvento) = @Anio 
                                   AND MONTH(EventosIngreso.FechaEvento) = @Mes
+                                  AND (eventosingreso.Borrado = 0)
                                 ORDER BY EventosIngreso.FechaEvento ASC;";
 
                 using (var connection = new SqlConnection(connectionString))
