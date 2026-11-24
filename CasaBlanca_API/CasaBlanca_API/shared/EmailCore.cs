@@ -9,6 +9,7 @@ namespace CasaBlanca_API.shared
     {
 
 
+
         public async Task SendEmail(string password, string to, string subject, CancellationToken cancellationToken = default)
         {
             try
@@ -47,7 +48,7 @@ namespace CasaBlanca_API.shared
                 await smtp.ConnectAsync("ws117.win.arvixe.com", 465, SecureSocketOptions.SslOnConnect);
 
                 // AUTENTICACIÓN
-                await smtp.AuthenticateAsync("rgarrido@officenet.com.mx", "7v0SN6vXO2oyhTi");
+                await smtp.AuthenticateAsync("rgarrido@officenet.com.mx", "zQ9o7MWDkHaEWQ");
 
                 // ENVÍO
                 await smtp.SendAsync(message);

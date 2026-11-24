@@ -11,7 +11,8 @@ namespace CasaBlanca_API.EndPoints
         public static void ConfigureUsuarioEndpoints(this WebApplication app)
         {
             var connectionString = app.Configuration.GetConnectionString("DefultConnection");
-            
+            string? pswdEmail = app.Configuration["pswdEmail"];
+
             app.MapGet("/api/GetAllUsers", GetAllUsers).WithName("GetUsers").Produces<IEnumerable<GetUsuariosResponse>>(200).Produces(500);
             app.MapGet("/api/GetUserById/{id}", GetUserById).WithName("GetUserById").Produces<UsuarioResponse>(200).Produces(404).Produces(500);
             app.MapPost("/api/CreateUser", CreateUser).WithName("CreateUser").Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status500InternalServerError);
@@ -97,9 +98,10 @@ namespace CasaBlanca_API.EndPoints
                      detail: "Datos incorrectos y duplicados.",
                      statusCode: StatusCodes.Status400BadRequest);
                 }
-                
+
 
                 // send email
+                
                 var emailCore = new EmailCore();
 
                 await emailCore.SendEmail(textoAleatorio, usuarioRequest.EmailUsuario, "Alta de nuevo usuario");
