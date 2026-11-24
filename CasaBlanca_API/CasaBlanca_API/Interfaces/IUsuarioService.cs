@@ -1,4 +1,5 @@
-﻿using CasaBlanca_API.Models.DTO.Usuario;
+﻿using CasaBlanca_API.Models;
+using CasaBlanca_API.Models.DTO.Usuario;
 
 namespace CasaBlanca_API.Interfaces
 {
@@ -10,5 +11,8 @@ namespace CasaBlanca_API.Interfaces
         Task<IResult> ActualizarUsuarioAsync(UsuarioEditRequest usuario);
         Task<LoginResponseDTO> GetUserByEmailAndPasswordAsync(string email, string password);
         Task<IResult> ActualizarUsuarioPasswordAsync(UsuarioUpdatePasswordRuquest usuario);
+        Task<bool> ResetPasswordUsuarioAsync(UsuarioUpdatePasswordRuquest usuario);
+        Task<IResult> GetUsuarioByEmailAsync(string Email);
+
     }
 }

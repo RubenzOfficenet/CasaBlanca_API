@@ -417,6 +417,78 @@ namespace CasaBlanca_API.Implementations
             }
         }
 
+        public async Task<IResult> GetUsuarioByEmailAsync(string Email)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"SELECT usuario.id,
+                                    usuario.nombre,
+                                    usuario.apellidos,
+                                    usuario.email,
+                                    usuario.celular,
+                                    casa_usuario.idrol,
+                                    roluser.rol,
+                                    casa_usuario.idcasa,
+                                    inmueble.numerocasa,
+                                    inmueble.id as 'IdInmueble',
+                                    inmueble.idubicacion,
+                                    ubicacion.nombreubicacion,
+                                    casa_usuario.idtiporelacion,
+                                    tiporelacion.tiporelacion,
+                                    usuario.idestatus,
+                                    estatus.estatus,
+                                    usuario.DebeCambiarPassword
+                            FROM   usuario
+                                    INNER JOIN casa_usuario ON usuario.id = casa_usuario.idusuario
+                                    INNER JOIN roluser ON casa_usuario.idrol = roluser.id
+                                    INNER JOIN inmueble ON casa_usuario.idcasa = inmueble.id
+                                    INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
+                                    INNER JOIN tiporelacion ON casa_usuario.idtiporelacion = tiporelacion.id
+                                    INNER JOIN estatus ON usuario.idestatus = estatus.id 
+                        WHERE usuario.Email = @Email";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    var user = await connection.QueryFirstOrDefaultAsync<UsuarioResponseDTO>(query, new { Email });
+
+                    if (user == null)
+                        return Results.NotFound($"Usuario con el Email {Email} no encontrado.");
+
+                    return Results.Ok(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Ocurrió un error: {ex.Message}", statusCode: 500);
+            }
+        }
+
+
+        public async Task<bool> ResetPasswordUsuarioAsync(UsuarioUpdatePasswordRuquest usuario)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"UPDATE usuario SET 
+                                DebeCambiarPassword = 1,
+                                password = @Password
+                                where id = @Id";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    int rowsAffected = await connection.ExecuteAsync(query, new { password = usuario.Password, id = usuario.Id });
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 
 } // end class

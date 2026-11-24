@@ -19,6 +19,8 @@ namespace CasaBlanca_API.EndPoints
             app.MapPut("/api/UpdateUsuario", UpdateUsuario).WithName("UpdateUsuario").Accepts<UsuarioEditRequest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
             app.MapGet("/api/GetUserByEmailAndPassword", GetUserByEmailAndPassword).WithName("GetUserByEmailAndPassword").Produces<LoginResponseDTO>(200).Produces(404).Produces(500);
             app.MapPut("/api/UpdatePassword", UpdatePassword).WithName("UpdatePassword").Accepts<UsuarioUpdatePasswordRuquest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
+            app.MapPost("/api/RecoveryPassword", RecoveryPassword).WithName("RecoveryPassword").Produces(StatusCodes.Status200OK).Produces(500);
+
         }
 
         public async static Task<IResult> GetAllUsers(IUsuarioService service)
@@ -171,6 +173,59 @@ namespace CasaBlanca_API.EndPoints
                 return Results.InternalServerError($"An error occurred: {ex.Message}");
             }
         }
+
+        public static async Task<IResult> RecoveryPassword(string email, IUsuarioService usuarioService)
+        {
+            try
+            {
+                // 1. Obtener el usuario primero (antes de generar contraseñas)
+                var result = await usuarioService.GetUsuarioByEmailAsync(email);
+
+                // Validar de forma segura si el resultado es Ok<UsuarioResponseDTO> y no es nulo
+                if (result is not Microsoft.AspNetCore.Http.HttpResults.Ok<UsuarioResponseDTO> okResult || okResult.Value is null)
+                {
+                    return Results.NotFound(new { message = "No se encontró un usuario registrado con ese correo." });
+                }
+
+                UsuarioResponseDTO usuarioResponseDTO = okResult.Value;
+
+                // 2. Generar la contraseña aleatoria y su hash
+                string textoAleatorio = TextGeneratorService.GenerateRandomTextChars();
+                string passwordGenerated = PasswordHasher.GenerateFromSeed(textoAleatorio);
+
+                var usuarioUpdatePasswordRequest = new UsuarioUpdatePasswordRuquest
+                {
+                    Id = usuarioResponseDTO.Id,
+                    Password = passwordGenerated
+                };
+
+                // 3. Actualizar el password en BD (faltaba el 'await')
+                bool actualizado = await usuarioService.ResetPasswordUsuarioAsync(usuarioUpdatePasswordRequest);
+
+                if (!actualizado)
+                {
+                    return Results.Problem(
+                        detail: "No se pudo actualizar la contraseña en la base de datos.",
+                        statusCode: StatusCodes.Status500InternalServerError,
+                        title: "Error al actualizar");
+                }
+
+                // 4. Enviar el correo con la contraseña en texto plano
+                var emailCore = new EmailCore();
+                await emailCore.SendEmail(textoAleatorio, email, "Recuperar contraseña");
+
+                // 5. Devolver Results.Ok en lugar de Results.Problem con código 200
+                return Results.Ok(new { message = "Se recuperó la contraseña correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "Error al recuperar la contraseña");
+            }
+        }
+
 
 
     }
