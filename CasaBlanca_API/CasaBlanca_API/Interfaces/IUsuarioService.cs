@@ -13,6 +13,7 @@ namespace CasaBlanca_API.Interfaces
         Task<IResult> ActualizarUsuarioPasswordAsync(UsuarioUpdatePasswordRuquest usuario);
         Task<bool> ResetPasswordUsuarioAsync(UsuarioUpdatePasswordRuquest usuario);
         Task<IResult> GetUsuarioByEmailAsync(string Email);
+        Task<bool> DeleteUsuarioAsync(int id);
 
     }
 }

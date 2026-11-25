@@ -52,6 +52,7 @@ namespace CasaBlanca_API.Implementations
                                    INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id
                                    INNER JOIN tiporelacion ON casa_usuario.idtiporelacion = tiporelacion.id
                                    INNER JOIN estatus ON usuario.idestatus = estatus.id 
+                            where usuario.IdEstatus = 1
                             ORDER BY
                                 inmueble.numerocasa;";
 
@@ -323,7 +324,8 @@ namespace CasaBlanca_API.Implementations
                                 nombre = usuario.Nombre,
                                 Apellidos = usuario.Apellidos,
                                 email = usuario.Email,
-                                celular = usuario.Celular
+                                celular = usuario.Celular,
+                                DebeCambiarPassword = usuario.DebeCambiarPassword
                             };
 
                             // Se pasa el parámetro transaction a las llamadas de Dapper
@@ -475,7 +477,8 @@ namespace CasaBlanca_API.Implementations
                 string query = @"UPDATE usuario SET 
                                 DebeCambiarPassword = 1,
                                 password = @Password
-                                where id = @Id";
+                                where id = @Id
+                                and IdEstatus = 1";
 
                 using (var connection = new SqlConnection(connectionString))
                 {
@@ -488,6 +491,27 @@ namespace CasaBlanca_API.Implementations
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<bool> DeleteUsuarioAsync(int id)
+        {
+            try
+            {
+                var connectionString = _configuration.GetConnectionString("DefultConnection");
+
+                string query = @"UPDATE usuario SET idEstatus = 2 WHERE id = @id";
+
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    int rowsAffected = await connection.ExecuteAsync(query, new { id });
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
     }
 

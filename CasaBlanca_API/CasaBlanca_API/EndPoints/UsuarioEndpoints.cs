@@ -20,7 +20,7 @@ namespace CasaBlanca_API.EndPoints
             app.MapGet("/api/GetUserByEmailAndPassword", GetUserByEmailAndPassword).WithName("GetUserByEmailAndPassword").Produces<LoginResponseDTO>(200).Produces(404).Produces(500);
             app.MapPut("/api/UpdatePassword", UpdatePassword).WithName("UpdatePassword").Accepts<UsuarioUpdatePasswordRuquest>("application/json").Produces<int>(200).Produces<string>(400).Produces<string>(500);
             app.MapPost("/api/RecoveryPassword", RecoveryPassword).WithName("RecoveryPassword").Produces(StatusCodes.Status200OK).Produces(500);
-
+            app.MapDelete("/api/DeleteUsuario/{id:int}", DeleteUsuario).WithName("DeleteUsuario").Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status500InternalServerError);
         }
 
         public async static Task<IResult> GetAllUsers(IUsuarioService service)
@@ -226,6 +226,37 @@ namespace CasaBlanca_API.EndPoints
             }
         }
 
+
+        public static async Task<IResult> DeleteUsuario(int id, IUsuarioService usuarioService)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return Results.BadRequest(new { message = "El ID del usuario no es válido." });
+                }
+
+                bool eliminado = await usuarioService.DeleteUsuarioAsync(id);
+
+                if (!eliminado)
+                {
+                    return Results.NotFound(new
+                    {
+                        title = "Usuario no encontrado",
+                        detail = $"No se encontró el usuario con ID {id}"
+                    });
+                }
+
+                return Results.Ok(new { message = "Usuario eliminado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "Error al eliminar el usuario");
+            }
+        }
 
 
     }
