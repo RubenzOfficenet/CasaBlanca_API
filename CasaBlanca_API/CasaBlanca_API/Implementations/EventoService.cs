@@ -49,34 +49,6 @@ namespace CasaBlanca_API.Implementations
                                             AND ei.fechaevento < @fechaFin
                                             AND ei.Borrado = 0 
                                     ORDER BY ei.fechaevento DESC";
-                /*
-                //string query = @"SELECT eventosingreso.id,
-                //                   eventosingreso.idinmueble,
-                //                   eventosingreso.idestatusevento,
-                //                   inmueble.idubicacion,
-                //                   ubicacion.nombreubicacion,
-                //                   inmueble.numerocasa,
-                //                   eventosingreso.fechaevento,
-                //                   inmueble.nombretitular,
-                //                   inmueble.apellidostitular,
-                //                   eventosingreso.recibonumero,
-                //                   eventosingreso.fechapago,
-                //                   eventosingreso.apartado,
-                //                   eventosingreso.liquida,
-                //                   eventosingreso.luz,
-                //                   eventosingreso.depositogarantia,
-                //                   eventosingreso.limpiezadomingo,
-                //                   eventosingreso.rentainmobiliario,
-                //                   estatusevento.estatusevento,
-                //                   eventosingreso.apartado + eventosingreso.liquida + eventosingreso.luz + eventosingreso.depositogarantia + eventosingreso.limpiezadomingo + eventosingreso.rentainmobiliario as Total
-                //            FROM   eventosingreso
-                //                   INNER JOIN inmueble ON eventosingreso.idinmueble = inmueble.id
-                //                   INNER JOIN estatusevento ON eventosingreso.idestatusevento = estatusevento.id
-                //                   INNER JOIN ubicacion ON inmueble.idubicacion = ubicacion.id 
-                //            WHERE  YEAR(eventosingreso.fechaevento) = @year
-                //                   AND MONTH(eventosingreso.fechaevento) = @month
-                //                   AND eventosingreso.Borrado = 0 ";
-                */
                 
                 using (var connection = new SqlConnection(connectionString))
                 {

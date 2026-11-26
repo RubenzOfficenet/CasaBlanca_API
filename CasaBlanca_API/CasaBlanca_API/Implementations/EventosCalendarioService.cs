@@ -23,6 +23,37 @@ namespace CasaBlanca_API.Implementations
 
                 string query = @"SELECT eventosingreso.id,
                                    eventosingreso.idinmueble,
+                                   eventosingreso.idestatusevento,
+                                   estatusevento.estatusevento,
+                                   eventosingreso.fechaevento,
+                                   eventosingreso.recibonumero,
+                                   eventosingreso.fechapago,
+                                   eventosingreso.apartado,
+                                   eventosingreso.liquida,
+                                   eventosingreso.luz,
+                                   eventosingreso.depositogarantia,
+                                   eventosingreso.limpiezadomingo,
+                                   eventosingreso.rentainmobiliario,
+                                   eventosingreso.borrado,
+                                   ubicacion.nombreubicacion,
+                                   inmueble.numerocasa
+                            FROM   eventosingreso
+                                   INNER JOIN inmueble
+                                           ON eventosingreso.idinmueble = inmueble.id
+                                   INNER JOIN estatusevento
+                                           ON eventosingreso.idestatusevento = estatusevento.id
+                                   INNER JOIN ubicacion
+                                           ON inmueble.idubicacion = ubicacion.id 
+                            WHERE 
+                                YEAR(EventosIngreso.FechaEvento) = @Anio
+                            AND 
+                                MONTH(EventosIngreso.FechaEvento) = @Mes
+                            AND 
+                                (eventosingreso.Borrado = 0)";
+
+                /*
+                string query = @"SELECT eventosingreso.id,
+                                   eventosingreso.idinmueble,
                                    inmueble.numerocasa,
                                    inmueble.idubicacion,
                                    ubicacion.nombreubicacion,
@@ -54,7 +85,8 @@ namespace CasaBlanca_API.Implementations
                                 WHERE YEAR(EventosIngreso.FechaEvento) = @Anio 
                                   AND MONTH(EventosIngreso.FechaEvento) = @Mes
                                   AND (eventosingreso.Borrado = 0)
-                                ORDER BY EventosIngreso.FechaEvento ASC;";
+                //                ORDER BY EventosIngreso.FechaEvento ASC;";
+                */
 
                 using (var connection = new SqlConnection(connectionString))
                 {
